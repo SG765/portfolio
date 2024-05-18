@@ -1,0 +1,22 @@
+.login-page{
+    padding: 10px;
+    color: white;
+}
+
+.form{
+    background-color: rgba(0, 166, 255, 0.4);
+    padding: 40px 30px 5px 30px;
+    border-radius: 20px;
+    width: 50vw;
+    margin: 20px;
+    color: white;
+}
+
+.form-item .ant-form-item-label label {
+    color: #ffffff !important; /* Change label color */
+    font-style: bold;
+  }
+  
+.form-item .ant-form-item-rule-message message{
+    color: #00ff00 !important; /* Change message color */
+  }

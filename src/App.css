@@ -1,0 +1,49 @@
+/* App.css */
+body, html {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  font-family: Arial, sans-serif;
+}
+
+.app-bg {
+  position: relative;
+  background: rgba(1, 29, 73, 0.871);
+  background-size: cover;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: start;
+  height: 100vh;
+  width: 100vw;
+  text-align: center;
+  margin: 0 auto;
+  overflow: hidden;
+}
+
+.content { 
+  border-radius: 10px; 
+  z-index: 1; 
+}
+
+.confetti {
+  position: absolute;
+  width: 40px;
+  height: 40px; 
+  bottom: -75%;
+  display: block;
+  opacity: 0.7;
+  animation:  fall 5s linear;
+  box-shadow: 1px 0px 7px rgba(254, 255, 202, 0.751);
+}
+
+@keyframes fall {
+  0% {
+    transform: translateY(0) rotate(0deg);
+  }
+  100% {
+    transform: translateY(-30vh) rotate(360deg);
+    opacity: 0;
+  }
+}

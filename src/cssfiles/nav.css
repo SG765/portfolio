@@ -1,0 +1,35 @@
+.nav{ 
+    top: 10px;
+    height: fit-content;
+    width: fit-content; 
+    background: #23599c  !important;
+    border-radius: 12px;
+    margin: 5px;
+    align-self: center; 
+    color: white;
+    align-items: center;
+    align-content: center;
+    left:0;
+}
+
+.nav-container{
+    width:100%;
+    justify-content: center;
+}
+
+.nav .ant-menu-item, 
+.nav .ant-menu-submenu-title {
+  color: #ffffff !important; /* Text color */
+}
+
+.nav .ant-menu-item:hover, 
+.nav .ant-menu-submenu-title:hover,
+.nav .ant-menu-item-active,
+.nav .ant-menu-item-selected {
+  color: #00ccff !important; /* Highlight color */
+  transition: border-bottom 0.3s;
+}
+
+  .nav .ant-menu-item-selected::after { 
+    transition: border-bottom 0.3s; /* Smooth transition for border bottom */
+  } 
