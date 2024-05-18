@@ -5,11 +5,11 @@ import  {getAuth} from "firebase/auth"
 import { getFirestore } from "firebase/firestore";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
-
+ 
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: "AIzaSyBn1aPEjCNvuX8bW4vtBvbvoflOiVSIqT8",
+  apiKey: `${import.meta.env.VITE_FIREBASE_API_KEY}`,
   authDomain: "portfolio-af38c.firebaseapp.com",
   projectId: "portfolio-af38c",
   storageBucket: "portfolio-af38c.appspot.com",
