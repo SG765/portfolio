@@ -20,3 +20,8 @@
 .form-item .ant-form-item-rule-message message{
     color: #00ff00 !important; /* Change message color */
   }
+
+.help-icon{
+  color:'aqua';
+  margin:'5px';
+}

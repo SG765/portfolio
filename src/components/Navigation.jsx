@@ -11,8 +11,7 @@ function Navigation({loggedIn}){
 
     useEffect(() => {
       // Check authentication status and update loggedIn state
-      const authToken = localStorage.getItem('authToken');
-      console.log(authToken)
+      const authToken = localStorage.getItem('authToken'); 
       loggedIn= !!authToken;
     }, []);
 
@@ -34,7 +33,7 @@ function Navigation({loggedIn}){
             key: loggedIn ? 'logout' : 'login',
             icon: '', 
             isHidden: true,
-            color: 'black',
+            color: 'white',
         }
     ]
 

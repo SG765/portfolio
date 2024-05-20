@@ -1,20 +1,23 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef} from 'react'
 import './App.css'
-import {BrowserRouter, Route, Routes} from 'react-router-dom'
-import {Button} from 'antd'
+import {BrowserRouter, Route, Routes} from 'react-router-dom' 
 import About from './pages/About';
 import Login from './pages/Login';
 import Projects from './pages/Projects';
 import Navigation from './components/Navigation';
 import { auth, db } from './firebase'
 import {onAuthStateChanged  } from "firebase/auth";
+import { message, Button } from 'antd';
 
 function App() { 
   const [loggedIn, setLoggedIn]= useState(false);
+  const confettiRef= useRef(null)
 
   useEffect(() => {
     const createConfetti = (side) => {
-      const confettiContainer = document.getElementById('confetti-container');
+      if (!confettiRef.current) return;
+
+      const confettiContainer = confettiRef.current;
       const confetti = document.createElement('div');
       confetti.className = 'confetti';
       confetti.style.backgroundColor = getRandomColor();
@@ -57,8 +60,7 @@ function App() {
 
     const handleLoginChange = onAuthStateChanged(auth, async (user) => {
       if (user) {
-          setLoggedIn(true);
-          console.log(loggedIn)
+          setLoggedIn(true); 
       } else {
           // User is signed out.
           setLoggedIn(false);
@@ -67,9 +69,13 @@ function App() {
     return () => handleLoginChange();
   }, []);
 
+  const clickm=()=>{
+    message.success("Hello")
+  }
+
   return (
     <div className="app-bg">
-      <div id="confetti-container" />
+      <div ref={confettiRef} id="confetti-container" />
       <BrowserRouter>
         <Navigation loggedIn={loggedIn}/>
         <div className="content">

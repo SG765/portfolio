@@ -2,9 +2,11 @@
 import {useState, useEffect} from 'react'
 import DOMPurify from 'dompurify';
 import Navigation from '../components/Navigation';
-import { Button } from 'antd';
+import { Button, Row } from 'antd';
 import EditProjectModal from '../components/EditProjectModal';
 import { get_all_projects } from '../controllers/Project';
+import ProjectCard from '../components/ProjectCard';
+import '../cssfiles/projects.css'
 
 
 function Projects({loggedIn}){
@@ -26,32 +28,30 @@ function Projects({loggedIn}){
             const data= await get_all_projects() 
             if(data.body != null){
                 setProjects(data.body)
-
-                console.log(projects)
             }
         }
         fetchProjects();
     },[]);
       
     return (
-        <div  style={{ width:"80vw", height:"100vh", zIndex:1, margin: 'auto'}}> 
+        <div className='page' style={{ width:"85vw", minHeight:"86vh", zIndex:1, margin: 'auto'
+        }}> 
         { loggedIn && (
-            <><Button  onClick={handleAddProjectOpen}>Add Project</Button>
+            <div><Button style={{justifySelf: 'end'}} onClick={handleAddProjectOpen}>Add Project</Button>
             <EditProjectModal open={isAddModalOpen} onCancel={() => setIsAddModalOpen(false)}/>
-            </>
+            </div>
         )}
 
-        {projects &&(
-            /*testing out getting data */
-            projects.map((data, index)=> (
-                <>
-                <div key={index} style={{color:'white'}}>{data.name}</div>
-                <div style={{color:'white'}} dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(data.desc) }} />
-                </>
+        <Row style={{margin: "20px", justifyContent: "center"}}>
+            {projects && (
+                /*testing out getting data */
+                projects.map((data, index)=> (
+                    <ProjectCard key={index} projData={data} loggedIn={loggedIn}/>
+                )
+                )
             )
-            )
-        )
-        }
+            }
+        </Row>
 
         </div>
     );

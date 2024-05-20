@@ -9,7 +9,8 @@ export default class Project{
         startDate=null,
         endDate=null,
         repo='',
-        deploy=''
+        deploy='',
+        cover=''
     ){
         this.name=name;
         this.desc=desc;
@@ -17,12 +18,13 @@ export default class Project{
         this.endDate = endDate instanceof Date ? endDate : endDate.toDate(); // change to date
         this.repo=repo;
         this.deploy=deploy;
+        this.cover=cover;
     }
 
-    static async POST_project ( name, desc, startDate,endDate, repo, deploy ) {
+    static async POST_project ( name, desc, startDate,endDate, repo, deploy, cover ) {
         try {
             //create  instance
-            const project = new Project( name, desc, startDate,endDate, repo, deploy ); 
+            const project = new Project( name, desc, startDate,endDate, repo, deploy, cover ); 
 
             //create collection ref 
             const coll_ref = collection ( db, 'projects');
@@ -74,6 +76,38 @@ export default class Project{
 
     static async get_project_by_id(id){
 
+    }
+
+    static async show_project(id){
+        let doc_snapshot;
+        let status;
+        try{
+            await runTransaction( db, async ( transaction ) => {
+                const doc_ref= doc(db, "projects", id)
+                doc_snapshot = await getDoc ( doc_ref );
+
+                if ( !doc_snapshot.exists() || doc_snapshot.empty ) {
+                    console.log ( 'document does not exist' );
+                    return false;
+                }
+
+                if(!doc_snapshot.data().shown){
+                    status= "Displayed";
+                }else{
+                    status="Hidden";
+                }
+
+                transaction.update(doc_ref, {
+                    shown: !doc_snapshot.data().shown,
+                });
+            })
+
+
+            return {status: 200, body: `${doc_snapshot.data().name} is now ${status}`}
+        }catch(error){
+            console.log("Error toggling status: ", error)
+        }
+        
     }
 
 }

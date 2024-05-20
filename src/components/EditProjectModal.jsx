@@ -1,17 +1,19 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Button, Form, Modal, Input, DatePicker } from 'antd';
+import { Button, Form, Modal, Input, DatePicker, Upload } from 'antd';
 import Quill from '../quill'; // Import the customized Quill setup
 import 'quill/dist/quill.snow.css'; // Import Quill stylesheet
 import { create_project } from '../controllers/Project';
+import { UploadOutlined } from '@ant-design/icons';
 
 const { TextArea } = Input;
 
-const EditProjectModal = ({ open, onCancel }) => {
+const EditProjectModal = ({ open, onCancel, projData, mode }) => {
   const [form] = Form.useForm();
   const [desc, setDescription] = useState('');
   const editorRef = useRef(null);
   const quillInitializedRef= useRef(false);
   const quillRef = useRef(null)
+  const [coverImg, setImage]= useState(null)
 
   useEffect(() => {
     if (!quillInitializedRef.current && open) {
@@ -61,8 +63,19 @@ const EditProjectModal = ({ open, onCancel }) => {
     const quillContent = editorRef.current.querySelector('.ql-editor').innerHTML;
     console.log('Quill content:', quillContent);
     console.log('Form values:', values);
-    const success= await create_project(values.name, quillContent, values.start, values.end, values.repo, values.deploy)
+    const success= await create_project(values.name, quillContent, values.start, values.end, values.repo, values.deploy, coverImg)
     onCancel();
+  };
+
+  const handleFileInputChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImage(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   return (
@@ -78,6 +91,9 @@ const EditProjectModal = ({ open, onCancel }) => {
       <Form form={form} onFinish={onFinish}>
         <Form.Item label="Project Name" name="name" rules={[{ required: true, message: 'Please enter project name!' }]}>
           <Input placeholder="Enter Project Name" />
+        </Form.Item>
+        <Form.Item label="Cover Image" name="cover">
+          <input type="file" accept="image/*" onChange={handleFileInputChange} />
         </Form.Item>
         <Form.Item label="Description" name="desc" >
           <div id="editor" ref={editorRef}></div>

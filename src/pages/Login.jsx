@@ -1,8 +1,9 @@
 import '../cssfiles/login.css'
-import {Form, Checkbox, Input, Button, message} from 'antd'
+import {Form, Checkbox, Input, Button, message, Popover} from 'antd'
 import { fetchSignInMethodsForEmail, signInWithEmailAndPassword, signOut, onAuthStateChanged  } from "firebase/auth";
 import { auth, db } from '../firebase'
 import {useNavigate} from 'react-router-dom'
+import {QuestionCircleOutlined } from '@ant-design/icons'
 
 function Login(){
     const navigate= useNavigate();
@@ -37,10 +38,22 @@ function Login(){
     console.log('Failed:', errorInfo);
     };
 
+    const help = (
+        <p>
+            Login allows me to edit the site content from the UI so that changes need not be coded in.
+        </p>
+    )
+
 
     return (
         <div className='login-page'> 
-            <div>Login</div>
+            <div>Login
+            <Popover content={help} title="What is login for?" trigger="click">
+                <QuestionCircleOutlined style={{color:'aqua', margin:'5px'}} className="help-icon"/>
+            </Popover>
+            
+            
+            </div>
             <Form className='form' name="basic" labelCol={{span: 6,}} wrapperCol={{ span: 16,}} style={{ maxWidth: 600, }} 
             initialValues={{ remember: true,}} onFinish={onFinish} onFinishFailed={onFinishFailed} autoComplete="off">
                 <Form.Item className="form-item" label="Email" name="email">
