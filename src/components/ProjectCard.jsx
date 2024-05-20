@@ -3,7 +3,7 @@ import DOMPurify from 'dompurify';
 import { useEffect, useState } from 'react';
 import { toggle_show_project } from '../controllers/Project';
 import {Card, Image, Button, AutoComplete, Switch, Divider, message} from 'antd'
-import { EditOutlined, EllipsisOutlined, SettingOutlined } from '@ant-design/icons';
+import { EditOutlined, EllipsisOutlined, SettingOutlined, DeleteOutlined } from '@ant-design/icons';
 import {geekblue, blue, cyan, gold, yellow, purple} from '@ant-design/colors';
 import EditProjectModal from './EditProjectModal';
 const { Meta } = Card;
@@ -19,11 +19,7 @@ function ProjectCard({projData, loggedIn}){
     loggedIn= !!authToken;
   }, []);
 
-
-  const actionOptions=[
-    <Button type="primary">View Details</Button>
-  ];
-
+  
   const onChangeShow = async(checked) => {
     setShowStatus(checked);
     const response= await toggle_show_project(projData.id)
@@ -34,9 +30,25 @@ function ProjectCard({projData, loggedIn}){
     setOpenEditModal(true)
   }
 
-  if(loggedIn){
-    actionOptions.push(<><Divider type="vertical"/><EditOutlined style={{fontSize:24, marginLeft:20, marginRight:20}} key="edit" onClick={handleEditClick} /><Divider type="vertical"/></>);
-    actionOptions.push( <>Show: <Switch  checked={showStatus} onChange={onChangeShow} /></>)
+  let actionOptions=[];
+
+  if(!loggedIn){
+    actionOptions=[
+      <>
+      <Button type="primary">View Details</Button>
+      </>
+    ]
+  }else{
+    actionOptions=[
+      <>
+      Show: <Switch  checked={showStatus} onChange={onChangeShow} />
+      <Button type="primary" style={{marginLeft:20, marginRight:10}}>View Details</Button>
+      <Divider type="vertical"/>
+      <EditOutlined style={{fontSize:24, marginLeft:10, marginRight:10}} key="edit" onClick={handleEditClick} />
+      <Divider type="vertical"/>
+      <DeleteOutlined style={{fontSize:24, marginLeft:10, marginRight:20}}/>
+      </>
+    ];
   }
 
     return(

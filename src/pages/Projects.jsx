@@ -4,7 +4,7 @@ import DOMPurify from 'dompurify';
 import Navigation from '../components/Navigation';
 import { Button, Row } from 'antd';
 import EditProjectModal from '../components/EditProjectModal';
-import { get_all_projects } from '../controllers/Project';
+import { get_all_projects, get_all_display_projects } from '../controllers/Project';
 import ProjectCard from '../components/ProjectCard';
 import '../cssfiles/projects.css'
 
@@ -25,7 +25,13 @@ function Projects({loggedIn}){
 
     useEffect(() =>{
         async function fetchProjects(){
-            const data= await get_all_projects() 
+            let data;
+            if(loggedIn){
+                data= await get_all_projects()
+            }else{
+                data= await get_all_display_projects() 
+            } 
+            
             if(data.body != null){
                 setProjects(data.body)
             }

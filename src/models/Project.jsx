@@ -71,7 +71,14 @@ export default class Project{
     }
 
     static async get_displayed_projects(){
+        const allProjects= await this.get_all_projects();
+        const displayed= allProjects.body.filter(project => project.shown === true)
 
+        if(displayed.length > 0){
+            return {status: 200, body: displayed}
+        }else{
+            return {status: 404, body: "No projects to display found"}
+        }
     }
 
     static async get_project_by_id(id){
