@@ -82,7 +82,28 @@ export default class Project{
     }
 
     static async get_project_by_id(id){
+        const docRef = doc(db, "projects", id);
+        const docSnap = await getDoc(docRef);
 
+        if (docSnap.exists()) {
+         return docSnap.data();
+        } else { 
+            console.log("No project found");
+        }
+
+    }
+
+    static async get_by_name(name){
+        const q= query(collection(db, "projects"))
+        const snapshot= await getDocs(q)
+
+        let project=[];
+        snapshot.forEach((doc) => {
+            if(doc.data().name === name){
+                project.push(doc.data());
+            }
+        }); 
+        return {status: 200, body: project};
     }
 
     static async show_project(id){

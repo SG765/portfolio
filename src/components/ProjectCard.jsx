@@ -1,6 +1,7 @@
 import '../cssfiles/projects.css';
 import DOMPurify from 'dompurify';
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { toggle_show_project } from '../controllers/Project';
 import {Card, Image, Button, AutoComplete, Switch, Divider, message} from 'antd'
 import { EditOutlined, EllipsisOutlined, SettingOutlined, DeleteOutlined } from '@ant-design/icons';
@@ -11,7 +12,9 @@ const { Meta } = Card;
 
 function ProjectCard({projData, loggedIn}){ 
   const [showStatus, setShowStatus] = useState(projData.shown);
-  const [openEditModal, setOpenEditModal]= useState(false)
+  const [openEditModal, setOpenEditModal]= useState(false);
+
+  const navigate= useNavigate();
 
   useEffect(() => {
     // Check authentication status and update loggedIn state
@@ -30,6 +33,10 @@ function ProjectCard({projData, loggedIn}){
     setOpenEditModal(true)
   }
 
+  const navToDetails = () =>{
+    navigate(`/projects/${projData.name}`)
+  }
+
   let actionOptions=[];
 
   if(!loggedIn){
@@ -42,7 +49,7 @@ function ProjectCard({projData, loggedIn}){
     actionOptions=[
       <>
       Show: <Switch  checked={showStatus} onChange={onChangeShow} />
-      <Button type="primary" style={{marginLeft:20, marginRight:10}}>View Details</Button>
+      <Button type="primary" style={{marginLeft:20, marginRight:10}} onClick={navToDetails}>View Details</Button>
       <Divider type="vertical"/>
       <EditOutlined style={{fontSize:24, marginLeft:10, marginRight:10}} key="edit" onClick={handleEditClick} />
       <Divider type="vertical"/>

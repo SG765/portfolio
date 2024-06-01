@@ -42,3 +42,12 @@ export const toggle_show_project= async(id)=>{
         console.log('Error toggling show status',error);
     }
 }
+
+export const get_proj_by_name= async(name)=>{
+    try{
+        const response= await Project.get_by_name(name);
+        return response;
+    }catch(e){
+        console.log(e)
+    }
+}

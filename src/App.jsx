@@ -8,6 +8,7 @@ import Navigation from './components/Navigation';
 import { auth, db } from './firebase'
 import {onAuthStateChanged  } from "firebase/auth";
 import { message, Button } from 'antd';
+import ProjDetails from './pages/ProjDetails';
 
 function App() { 
   const [loggedIn, setLoggedIn]= useState(false);
@@ -84,6 +85,7 @@ function App() {
             <Route path="/projects" element={<Projects loggedIn={loggedIn} />} />
             <Route path="/about" element={<About loggedIn={loggedIn}/>} />
             <Route path="/login" element={<Login loggedIn={loggedIn}/>} />
+            <Route path="/projects/:name" element={<ProjDetails loggedIn={loggedIn} />} />
           </Routes>
         </div>
       </BrowserRouter>
