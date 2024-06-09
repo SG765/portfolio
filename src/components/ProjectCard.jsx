@@ -42,7 +42,7 @@ function ProjectCard({projData, loggedIn}){
   if(!loggedIn){
     actionOptions=[
       <>
-      <Button type="primary">View Details</Button>
+      <Button type="primary" onClick={navToDetails}>View Details</Button>
       </>
     ]
   }else{

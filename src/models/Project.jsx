@@ -97,13 +97,26 @@ export default class Project{
         const q= query(collection(db, "projects"))
         const snapshot= await getDocs(q)
 
-        let project=[];
-        snapshot.forEach((doc) => {
-            if(doc.data().name === name){
-                project.push(doc.data());
+        let projects = [];
+
+        for (let docSnapshot of snapshot.docs) {
+            let projectData = docSnapshot.data();
+
+            if (projectData.name === name) {
+                // Fetch images subcollection
+                const imagesQuery = query(collection(db, "projects", docSnapshot.id, "images"));
+                const imagesSnapshot = await getDocs(imagesQuery);
+
+                let images = [];
+                imagesSnapshot.forEach((imageDoc) => {
+                    images.push(imageDoc.data());
+                });
+
+                projectData.images = images;
+                projects.push(projectData);
             }
-        }); 
-        return {status: 200, body: project};
+        } 
+        return {status: 200, body: projects};
     }
 
     static async show_project(id){
