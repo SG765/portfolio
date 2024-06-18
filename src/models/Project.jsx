@@ -8,12 +8,14 @@ export default class Project{
         desc='',
         startDate=null,
         endDate=null,
+        shortDesc='',
         repo='',
         deploy='',
         cover=''
     ){
         this.name=name;
         this.desc=desc;
+        this.shortDesc=shortDesc;
         this.startDate = startDate instanceof Date ? startDate : startDate.toDate(); // change to date
         this.endDate = endDate instanceof Date ? endDate : endDate.toDate(); // change to date
         this.repo=repo;
@@ -21,10 +23,10 @@ export default class Project{
         this.cover=cover;
     }
 
-    static async POST_project ( name, desc, startDate,endDate, repo, deploy, cover ) {
+    static async POST_project ( name, shortDesc, desc, startDate,endDate, repo, deploy, cover ) {
         try {
             //create  instance
-            const project = new Project( name, desc, startDate,endDate, repo, deploy, cover ); 
+            const project = new Project( name, shortDesc, desc, startDate,endDate, repo, deploy, cover ); 
 
             //create collection ref 
             const coll_ref = collection ( db, 'projects');
@@ -147,6 +149,55 @@ export default class Project{
             return {status: 200, body: `${doc_snapshot.data().name} is now ${status}`}
         }catch(error){
             console.log("Error toggling status: ", error)
+        }
+        
+    }
+
+    static async update_project(id, name, shortDesc, desc, startDate, endDate, repo, deploy, cover, images, shown){
+        let doc_snapshot; 
+
+        try{
+            await runTransaction( db, async ( transaction ) => {
+                const doc_ref= doc(db, "projects", id)
+                doc_snapshot = await getDoc ( doc_ref );
+
+                if ( !doc_snapshot.exists() || doc_snapshot.empty ) {
+                    console.log ( 'document does not exist' );
+                    return false;
+                }
+
+                transaction.update(doc_ref, {
+                    name: name,
+                    shortDesc: shortDesc,
+                    desc: desc,
+                    startDate: startDate,
+                    endDate:endDate,
+                    repo: repo,
+                    deploy: deploy,
+                    cover: cover,
+                    shown: shown,
+                });
+
+                 // Update images 
+                const imagesCollectionRef = collection(doc_ref, 'images');
+
+                // Delete existing images to prevent dups
+                const existingImagesSnapshot = await getDocs(imagesCollectionRef);
+                existingImagesSnapshot.forEach((doc) => {
+                    transaction.delete(doc.ref);
+                });
+
+                // Add new images to the subcollection
+                images.forEach((image, index) => {
+                    const imageDocRef = doc(imagesCollectionRef, `image${index}`);
+                    transaction.set(imageDocRef, image);
+                });
+            })
+
+
+            return {status: 200, body: `Project has been updated successfully`}
+        }catch(error){
+            console.log("Error updating project: ", error)
         }
         
     }

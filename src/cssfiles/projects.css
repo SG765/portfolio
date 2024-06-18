@@ -7,11 +7,27 @@
 .details-page{
   color: white;
   width: 95vw;
+  min-height: 90vh;
+  max-height: 90vh;
 }
 
 @media (min-width: 768px) {
   .details-page {
     width: 80vw;
+  }
+}
+
+@media (max-width: 768px) {
+  .back-arrow{
+    font-size: 1.8rem;
+    border-radius: 50%;
+    background-color: rgb(174, 174, 203, 0.3);
+    cursor: pointer;
+    padding: 4px;
+    transition: ease-in-out 0.3s;
+    margin: 5px;
+    position: absolute;
+    top: 10px;
   }
 }
 
@@ -105,3 +121,60 @@
     height:fit-content;
     margin-left: 20px;
   }
+
+  .edit-img-container {
+    position: relative;
+    display: inline-block;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.edit-img-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5); /* Semi-transparent black overlay */
+  opacity: 0;
+  transition: opacity 0.3s ease; 
+  z-index: 1; /* Ensure overlay is above the image */
+}
+
+.edit-img-container:hover::before {
+  opacity: 1; /* Show overlay on hover */
+}
+
+.delete-icon {
+    position: absolute;
+    top: 10px;
+    right: 10px; 
+    cursor: pointer;
+    color: black; /* Optional: to make the delete icon stand out */
+    transition: opacity 0.3s ease; 
+    z-index: 2;
+} 
+
+.edit-img-container:hover .delete-icon {
+  color: white; /* Change to white on hover */
+  transition: opacity 0.3s ease; 
+}
+
+.plus-icon{
+  cursor: pointer;
+}
+
+.plus-icon:hover{
+  color:#00ccff;
+}
+
+.file-input{
+  display: none;
+}
+
+.ql-toolbar .ql-divider::before {
+  content: "-";
+  font-size: 18px;
+  margin: 0 5px;
+}

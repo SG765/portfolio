@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Button, Form, Modal, Input, DatePicker, Upload } from 'antd';
-import Quill from '../quill'; // Import the customized Quill setup
+import { Quill, toolbarOptions } from '../quill'; // Import the customized Quill setup
 import 'quill/dist/quill.snow.css'; // Import Quill stylesheet
 import { create_project } from '../controllers/Project';
 import { UploadOutlined } from '@ant-design/icons';
@@ -20,10 +20,7 @@ const EditProjectModal = ({ open, onCancel, projData, mode }) => {
       quillRef.current = new Quill(editorRef.current, {
         theme: 'snow',
         modules: {
-          toolbar: [
-            [{ 'header': [1, 2, 3, 4, 5, 6, false] }, { 'font': [] }, { 'align': [] }], 
-            [{ 'color': [] }, { 'background': [] }, "bold","italic", "underline", "strike"], 
-            ["link", "image", "video"]], 
+          toolbar: toolbarOptions, 
           imageHandler: {
             upload: file => {
               // return a Promise that resolves in a link to the uploaded image

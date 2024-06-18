@@ -51,3 +51,12 @@ export const get_proj_by_name= async(name)=>{
         console.log(e)
     }
 }
+
+export const update_project= async(id, name, shortDesc, desc, startDate, endDate, repo, deploy, cover, images, shown)=>{
+    try{
+        const response= await Project.update_project(id, name, shortDesc, desc, startDate, endDate, repo, deploy, cover, images, shown);
+        return response;
+    }catch(error){
+        console.log('Error updating project',error);
+    }
+}
