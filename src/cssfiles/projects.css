@@ -163,6 +163,7 @@
 
 .plus-icon{
   cursor: pointer;
+  margin-left: 10px;
 }
 
 .plus-icon:hover{

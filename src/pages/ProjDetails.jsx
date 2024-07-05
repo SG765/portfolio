@@ -4,13 +4,14 @@ import { useMediaQuery } from 'react-responsive';
 import { useState, useEffect, useRef } from 'react'
 import { get_proj_by_name } from '../controllers/Project';
 import {ArrowLeftOutlined, DeleteOutlined, PlusCircleOutlined} from '@ant-design/icons'
-import { Divider, Flex, Carousel, Button, Input } from 'antd';
+import { Divider, Flex, Carousel, Button, Input, message, Upload } from 'antd';
 import DOMPurify from 'dompurify';
 import { Quill, toolbarOptions } from '../quill'; // Import the customized Quill setup
 import 'quill/dist/quill.snow.css'; // Import Quill stylesheet
 import { update_project } from '../controllers/Project';
 
 const { TextArea } = Input;
+const { Dragger } = Upload;
 
 function ProjDetails({loggedIn}){
     const params= useParams(); 
@@ -175,6 +176,45 @@ function ProjDetails({loggedIn}){
           reader.readAsDataURL(file);
         }
       };
+
+      const handleFileDrop = (files) =>{
+        console.log(files)
+        const newImgs=[]
+        Array.from(files).forEach(file => {
+            const reader = new FileReader();
+            reader.onload = () => {
+              newImgs.push({
+                src: reader.result,
+                desc: ''
+              });
+              // If all files are processed, update state
+              if (newImgs.length === files.length) {
+                setProjData(prevData => ({
+                  ...prevData,
+                  images: [...prevData.images, ...newImgs]
+                }));
+              }
+            };
+            reader.readAsDataURL(file);
+          });
+        };
+
+    const dragger_props ={
+        multiple: true,
+        showUploadList: false,
+          onDrop(e) {
+            handleFileDrop(e.dataTransfer.files)
+          },
+    }
+
+    const removeImg = (index) => {
+        setProjData(prevData => {
+          const newImages = [...prevData.images];
+          newImages.splice(index, 1); // Remove the image at the specified index
+          return { ...prevData, images: newImages };
+        });
+      };
+      
     
 
     return (
@@ -223,23 +263,28 @@ function ProjDetails({loggedIn}){
                                     </div>
                                 </div>
                             ))}
-                        </Carousel>):(
+                        </Carousel>): (
                             <>
-                            <Flex style={{padding: "10px"}}> 
+                            <Flex style={{padding: "10px", flexWrap: "wrap"}}> 
                             {projData.images.map((image, index) => (
                             
                                 <div key={index} style={{padding: "10px"}}>
                                     <div className="edit-img-container" onClick={() => setSelectedImageIndex(index)}>
                                         <img src={image.src} alt={`Slide ${index + 1}`} style={imgEditStyle} />
-                                        <DeleteOutlined className="delete-icon" />
+                                        <DeleteOutlined className="delete-icon" onClick={() => removeImg(index)}/>
                                     </div>
                                 </div> 
                                 
                             ))}
+                            
+                            <Dragger {...dragger_props} height="150px" style={{width: "200px", marginTop: "10px" }}> 
+                                <p className="ant-upload-text" style={{color:"white" }}>Click or drag file/s to this area to upload</p>
+                            </Dragger>
                             <input type="file" ref={fileInputRef} className="file-input" onChange={handleFileChange}/>
                             <PlusCircleOutlined className='plus-icon' id="uploadButton" onClick={handleImgUploadClick} style={{alignSelf: "flex-center", fontSize: "2rem"}}/>
-
+                            
                             </Flex>
+                            
                             <div style={{ textAlign: "center", padding: "10px" }} className='edit-img-desc'>
                                 <TextArea 
                                     value={projData.images[selectedImageIndex]?.desc || ""}
@@ -254,7 +299,6 @@ function ProjDetails({loggedIn}){
                             </> 
                         )
                     }
-
                     <Divider style={{backgroundColor: "white", padding: "0", marginTop:"10px", marginBottom:"0"}} width="100%"/>
 
                     {!editMode ?(

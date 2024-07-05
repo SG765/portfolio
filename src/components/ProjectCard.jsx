@@ -10,10 +10,10 @@ import EditProjectModal from './EditProjectModal';
 const { Meta } = Card;
 
 
-function ProjectCard({projData, loggedIn}){ 
+function ProjectCard({index, projData, loggedIn}){   
   const [showStatus, setShowStatus] = useState(projData.shown);
-  const [openEditModal, setOpenEditModal]= useState(false);
-
+  const [openEditModal, setOpenEditModal]= useState(false); 
+  const [coverImg, setCoverImg] = useState(projData.cover);
   const navigate= useNavigate();
 
   useEffect(() => {
@@ -37,6 +37,10 @@ function ProjectCard({projData, loggedIn}){
     navigate(`/projects/${projData.name}`)
   }
 
+  const handleCoverImgUpdate = (newCoverImg) => {
+    setCoverImg(newCoverImg); // Update cover image state
+  };
+
   let actionOptions=[];
 
   if(!loggedIn){
@@ -51,7 +55,7 @@ function ProjectCard({projData, loggedIn}){
       Show: <Switch  checked={showStatus} onChange={onChangeShow} />
       <Button type="primary" style={{marginLeft:20, marginRight:10}} onClick={navToDetails}>View Details</Button>
       <Divider type="vertical"/>
-      <EditOutlined style={{fontSize:24, marginLeft:10, marginRight:10}} key="edit" onClick={handleEditClick} />
+      <EditOutlined style={{fontSize:24, marginLeft:10, marginRight:10}} key="edit" onClick={handleEditClick}/>
       <Divider type="vertical"/>
       <DeleteOutlined style={{fontSize:24, marginLeft:10, marginRight:20}}/>
       </>
@@ -62,7 +66,7 @@ function ProjectCard({projData, loggedIn}){
         <>
             <Card className='card' hoverable>
               <div className='card-content'>
-                <Image height={200} width={'100%'} preview={false} src={projData.cover} fallback="" />
+                <Image height={200} width={'100%'} preview={false} src={coverImg} fallback="" />
                 <div className='card-title'>{projData.name}</div>
 
                 <div className='card-overlay'>
@@ -73,7 +77,7 @@ function ProjectCard({projData, loggedIn}){
                 {actionOptions}
               </div>
             </Card>
-            <EditProjectModal open={openEditModal} onCancel={() => setOpenEditModal(false)} projData={projData} mode="edit" />
+            <EditProjectModal key={index} open={openEditModal} onCancel={() => setOpenEditModal(false)} projData={projData} mode="edit" onCoverImgUpdate={handleCoverImgUpdate} />
         </>
     )
 }
