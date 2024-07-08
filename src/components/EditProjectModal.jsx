@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import dayjs from 'dayjs';
-import { Button, Form, Modal, Input, DatePicker, Upload, Flex} from 'antd'; 
+import { Button, Form, Modal, Input, DatePicker, Upload, Flex, message} from 'antd'; 
 import { create_project, update_project } from '../controllers/Project';
 import { UploadOutlined } from '@ant-design/icons';
 
 const { TextArea } = Input;
 
-const EditProjectModal = ({ open, onCancel, projData, mode, onCoverImgUpdate }) => { 
+const EditProjectModal = ({ open, onCancel, projData, mode, onUpdate }) => { 
   const [form] = Form.useForm();
   const [shortDesc, setShort] = useState( '');
   const [name, setName] =useState('')
@@ -47,10 +47,11 @@ const EditProjectModal = ({ open, onCancel, projData, mode, onCoverImgUpdate }) 
 
     const success= await update_project(projData.id, updatedName, updatedShortDesc, projData.desc, updatedStartDate, updatedEndDate, projData.repo, projData.deploy, coverImg, projData.images, projData.shown)
     if (success) {
-      onCoverImgUpdate(coverImg); // Call callback to update cover image
+      onUpdate(coverImg, updatedName, updatedShortDesc); // Call callback to update cover image
+
     }
     
-    console.log(success)
+    message.success(success.body)
     onCancel();
   };
 

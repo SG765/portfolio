@@ -3,12 +3,13 @@ import { useParams} from 'react-router-dom';
 import { useMediaQuery } from 'react-responsive';
 import { useState, useEffect, useRef } from 'react'
 import { get_proj_by_name } from '../controllers/Project';
-import {ArrowLeftOutlined, DeleteOutlined, PlusCircleOutlined} from '@ant-design/icons'
-import { Divider, Flex, Carousel, Button, Input, message, Upload } from 'antd';
+import {ArrowLeftOutlined, DeleteOutlined, PlusCircleOutlined, RightOutlined, LeftOutlined, PlusOutlined, MinusOutlined, FullscreenExitOutlined} from '@ant-design/icons'
+import { Divider, Flex, Carousel, Button, Input, message, Upload, Image, Modal, Spin } from 'antd';
 import DOMPurify from 'dompurify';
 import { Quill, toolbarOptions } from '../quill'; // Import the customized Quill setup
 import 'quill/dist/quill.snow.css'; // Import Quill stylesheet
 import { update_project } from '../controllers/Project';
+import { TransformWrapper, TransformComponent, useControls } from 'react-zoom-pan-pinch';
 
 const { TextArea } = Input;
 const { Dragger } = Upload;
@@ -22,8 +23,29 @@ function ProjDetails({loggedIn}){
     const endDate = projData ? projData.endDate.toDate() : null;
     const [editMode, setEditMode] = useState(false);
     const editorRef = useRef(null);
-  const quillInitializedRef= useRef(false);
-  const quillRef = useRef(null)
+    const quillInitializedRef= useRef(false);
+    const quillRef = useRef(null)
+    const [loading, setLoading] = useState(false)
+
+    const [currentPreview, setCurrentPreview] = useState(0); // State to track current previewed image index
+    const [previewOpen, setPreviewOpen]= useState(false)
+
+    const handleImageClick = (index) => {
+        setCurrentPreview(index); // Update state when an image is clicked 
+        setPreviewOpen(true)
+    };
+
+    const handleClosePreview = () =>{
+        setPreviewOpen(false)
+    }
+
+    const handleNext = () => {
+        setCurrentPreview((prev) => (prev + 1) % projData.images.length);
+    };
+
+    const handlePrev = () => {
+        setCurrentPreview((prev) => (prev - 1 + projData.images.length) % projData.images.length);
+    };
 
     const useResponsiveGap = () => {
         const isLarge = useMediaQuery({ query: '(min-width: 992px)' });
@@ -40,6 +62,7 @@ function ProjDetails({loggedIn}){
 
     useEffect(() => {
         async function fetchData() {
+            setLoading(true)
             const response = await get_proj_by_name(params.name);
             if (response.body && response.body.length > 0) {
                 const project = response.body[0];
@@ -47,6 +70,7 @@ function ProjDetails({loggedIn}){
                 setProjData(project);
                 setDescription(sanitizedHTML);
             }
+            setLoading(false)
         }
         fetchData(); 
     }, [params.name]);
@@ -101,13 +125,11 @@ function ProjDetails({loggedIn}){
     }, [editMode]);
 
     const contentStyle = {
-        height: '360px',
+        height: 'fit-content',
         color: '#fff',
-        lineHeight: '360px',
-        textAlign: 'center',
+        lineHeight: '360px', 
         background: '#364d79',
-        margin: "5px",
-        justifyContent: "center"
+        margin: 'auto',  
       };
 
       const imgEditStyle = {
@@ -129,20 +151,33 @@ function ProjDetails({loggedIn}){
         margin: "auto"
       };
 
+      const Controls = () => {
+        const { zoomIn, zoomOut, resetTransform } = useControls();
+      
+        return (
+          <div className="tools">
+            <PlusOutlined className='control-button' onClick={() => zoomIn()}/>
+            <MinusOutlined className='control-button' onClick={() => zoomOut()}/>
+            <FullscreenExitOutlined className='control-button' onClick={() => resetTransform()}/>
+          </div>
+        );
+      };
+
       const handleEditClick = () => {
         setEditMode(true);
         };
 
-    const handleSaveClick = () => {
+    const handleSaveClick = async () => {
         if (quillRef.current) {
             const updatedDesc = quillRef.current.root.innerHTML;
             setProjData(prevData => ({
                 ...prevData,
                 desc: updatedDesc
-            }));
+            })); 
             setDescription(updatedDesc); 
+            const shown = projData.shown !== undefined ? projData.shown : false; //for cases where shown is yet to be defined
 
-            const response= update_project(projData.id, projData.name, projData.shortDesc, updatedDesc, projData.startDate, projData.endDate, projData.repo, projData.deploy, projData.cover, projData.images, projData.shown)
+            const response= await update_project(projData.id, projData.name, projData.shortDesc, updatedDesc, projData.startDate, projData.endDate, projData.repo, projData.deploy, projData.cover, projData.images, shown)
             console.log(response.body)
         }
         
@@ -159,26 +194,30 @@ function ProjDetails({loggedIn}){
         fileInputRef.current.click();
     };
     
-    const handleFileChange = (event) => {
-        const file = event.target.files[0];
-        if (file) {
+    const handleFileChange = (event) => { 
+        const files=event.target.files;
+        const newImgs=[];
+
+        Array.from(files).forEach(file =>  { 
           const reader = new FileReader();
           reader.onload = () => {
-            const newImage = {
+            newImgs.push({
               src: reader.result,
               desc: ''
-            };
-            setProjData(prevData => ({
-              ...prevData,
-              images: [...prevData.images, newImage]
-            }));
+            }); 
+            if (newImgs.length === files.length) {
+                setProjData(prevData => ({
+                ...prevData,
+                images: [...prevData.images, ...newImgs]
+                }));
+            }
           };
           reader.readAsDataURL(file);
-        }
+        })
+        
       };
 
-      const handleFileDrop = (files) =>{
-        console.log(files)
+      const handleFileDrop = (files) =>{ 
         const newImgs=[]
         Array.from(files).forEach(file => {
             const reader = new FileReader();
@@ -219,6 +258,7 @@ function ProjDetails({loggedIn}){
 
     return (
         <div className='details-page' >
+            {loading ? ( <Flex vertical style={{padding:"50px"}}><Spin classname="spinner" size="large" /></Flex> ) : (<>
             {loggedIn && 
             (
                 <div style={{ textAlign: 'end', marginRight: '3rem' }}>
@@ -254,14 +294,16 @@ function ProjDetails({loggedIn}){
                     <Divider style={{backgroundColor: "white", padding: "0", margin:"0"}} width="100%"/>
                     
                     {!editMode ? (
-                        <Carousel arrows autoplay autoplaySpeed={3000} style={{margin: "10px"}}>
-                            {projData.images.map((image, index) => (
-                                <div key={index}>
-                                    <img src={image.src} alt={`Slide ${index + 1}`} style={contentStyle} />
+                        <Carousel arrows autoplay autoplaySpeed={3000} style={{margin: "10px"}} >
+                            {projData.images.map((image, index) => ( 
+                                <div key={index} style={{justifyItems: "center"}}>
+                                    <div style={{height: "300px", justifyContent: "centered"}}>
+                                        <Image src={image.src} alt={`Slide ${index + 1}`} preview={{visible: false}} style={contentStyle} onClick={() => handleImageClick(index)}/>
+                                    </div>
                                     <div style={descriptionStyle}>
                                         {image.desc}
                                     </div>
-                                </div>
+                                </div> 
                             ))}
                         </Carousel>): (
                             <>
@@ -277,10 +319,10 @@ function ProjDetails({loggedIn}){
                                 
                             ))}
                             
-                            <Dragger {...dragger_props} height="150px" style={{width: "200px", marginTop: "10px" }}> 
+                            <Dragger {...dragger_props}  height="150px" style={{width: "200px", marginTop: "10px" }}> 
                                 <p className="ant-upload-text" style={{color:"white" }}>Click or drag file/s to this area to upload</p>
                             </Dragger>
-                            <input type="file" ref={fileInputRef} className="file-input" onChange={handleFileChange}/>
+                            <input multiple type="file" ref={fileInputRef} className="file-input" onChange={handleFileChange}/>
                             <PlusCircleOutlined className='plus-icon' id="uploadButton" onClick={handleImgUploadClick} style={{alignSelf: "flex-center", fontSize: "2rem"}}/>
                             
                             </Flex>
@@ -299,6 +341,30 @@ function ProjDetails({loggedIn}){
                             </> 
                         )
                     }
+                    
+                    <Modal mask maskClosable closable open={previewOpen} onCancel={handleClosePreview} footer={null} width="90vw" height="100vh" className="custom-modal" centered
+                    style={{margin: "auto", alignContent: "center"}}>
+                        <Image.PreviewGroup items={projData.images} current={currentPreview}>
+                            <Flex style={{justifyContent: "center"}}>
+                                <div className="modal-content-wrapper" style={{position: "absolute", left: 0, transform: "translateX(-50%)", zIndex: 1,}}>
+                                    <LeftOutlined className='preview-nav-button' onClick={handlePrev} disabled={currentPreview === 0} style={{fontSize: '40px', color: 'white'}}/>
+                                </div> 
+                                <div key={currentPreview} style={{width: "90vw", height: "94vh", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden",}}>
+                                        <TransformWrapper centerOnInit initialScale={1} style={{width: "90vw", height: "100vh", margin: "auto" }} >
+                                            <TransformComponent wrapperStyle={{ width: "100%", height: "100%"}}>
+                                                <Image className="modal-content-wrapper" src={projData.images[currentPreview].src} alt={`Slide ${currentPreview + 1}`} preview={false} style={contentStyle} margin= "auto" />
+                                            </TransformComponent>
+                                            <div className="modal-content-wrapper" style={{position: "absolute", bottom: "10px", left: "50%", transform: "translateX(-50%)", zIndex: 1, }}>
+                                                <Controls/>
+                                            </div>
+                                        </TransformWrapper>
+                                </div>
+                                <div className="modal-content-wrapper" style={{ position: "absolute", right: 0, transform: "translateX(50%)", zIndex: 1, }}>
+                                    <RightOutlined className='preview-nav-button' onClick={handleNext} disabled={currentPreview === projData.images.length - 1} style={{fontSize: '40px', color: 'white'}}/>
+                                </div>
+                            </Flex>
+                        </Image.PreviewGroup>
+                    </Modal>
                     <Divider style={{backgroundColor: "white", padding: "0", marginTop:"10px", marginBottom:"0"}} width="100%"/>
 
                     {!editMode ?(
@@ -315,7 +381,9 @@ function ProjDetails({loggedIn}){
 
                 </div>
             )}
-            </Flex>
+            </Flex> 
+        </>
+        )}
         </div>
     );
 }

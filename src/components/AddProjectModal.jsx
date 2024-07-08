@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Button, Form, Modal, Input, DatePicker, Upload } from 'antd';
+import { Button, Form, Modal, Input, DatePicker, Upload, message } from 'antd';
 import { Quill, toolbarOptions } from '../quill'; // Import the customized Quill setup
 import 'quill/dist/quill.snow.css'; // Import Quill stylesheet
 import { create_project } from '../controllers/Project';
@@ -7,7 +7,7 @@ import { UploadOutlined } from '@ant-design/icons';
 
 const { TextArea } = Input;
 
-const AddProjectModal = ({ open, onCancel, projData, mode }) => {
+const AddProjectModal = ({ open, onCancel, projData, mode, onAdd }) => {
   const [form] = Form.useForm();
   const [desc, setDescription] = useState('');
   const editorRef = useRef(null);
@@ -60,7 +60,11 @@ const AddProjectModal = ({ open, onCancel, projData, mode }) => {
     const quillContent = editorRef.current.querySelector('.ql-editor').innerHTML;
     console.log('Quill content:', quillContent);
     console.log('Form values:', values);
-    const success= await create_project(values.name, quillContent, values.start, values.end, values.repo, values.deploy, coverImg)
+    const success= await create_project(values.name, values.shortDesc, quillContent, values.start, values.end, values.repo, values.deploy, coverImg)
+    if(success.status === 200){  
+        message.success(success.body)
+        onAdd();
+    }
     onCancel();
   };
 
@@ -74,6 +78,7 @@ const AddProjectModal = ({ open, onCancel, projData, mode }) => {
       reader.readAsDataURL(file);
     }
   };
+ 
 
   return (
     <Modal title="Add New Project" open={open} onCancel={onCancel} footer={[
@@ -91,6 +96,9 @@ const AddProjectModal = ({ open, onCancel, projData, mode }) => {
         </Form.Item>
         <Form.Item label="Cover Image" name="cover">
           <input type="file" accept="image/*" onChange={handleFileInputChange} />
+        </Form.Item>
+        <Form.Item label="Short Description" name="shortDesc" >
+          <Input placeholder="Enter Short Description" />
         </Form.Item>
         <Form.Item label="Description" name="desc" >
           <div id="editor" ref={editorRef}></div>

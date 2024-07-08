@@ -1,10 +1,9 @@
 import Project from '../models/Project'
 
 
-export const create_project= async(name, desc, startDate,endDate, repo, deploy, cover)=>{
-    try{
-        const success= await Project.POST_project(name, desc, startDate,endDate, repo,deploy, cover)
-        console.log(success)
+export const create_project= async(name, shortDesc, desc, startDate,endDate, repo, deploy, cover)=>{
+    try{ 
+        const success= await Project.POST_project(name, shortDesc, desc, startDate,endDate, repo,deploy, cover) 
         return success;
     } catch (error) {
         console.error('Error creating project:', error);
@@ -54,9 +53,15 @@ export const get_proj_by_name= async(name)=>{
 
 export const update_project= async(id, name, shortDesc, desc, startDate, endDate, repo, deploy, cover, images, shown)=>{
     try{
+         
         const response= await Project.update_project(id, name, shortDesc, desc, startDate, endDate, repo, deploy, cover, images, shown);
         return response;
     }catch(error){
         console.log('Error updating project',error);
     }
+}
+
+export const delete_project= async(id)=>{
+    const response= await Project.DELETE_project(id)
+    return response;
 }

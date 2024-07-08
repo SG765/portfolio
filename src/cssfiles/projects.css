@@ -179,3 +179,61 @@
   font-size: 18px;
   margin: 0 5px;
 }
+
+.custom-modal .ant-modal-content{
+  background: none !important;
+  box-shadow: none !important;
+  justify-content: space-between; 
+  pointer-events: none;
+}
+
+.custom-modal .ant-modal-body {
+  background: none !important;
+  pointer-events: none;
+}
+
+.custom-modal .ant-modal {
+  background: none !important;
+  pointer-events: none; 
+}
+
+.custom-modal .ant-modal-mask {
+  background-color: rgba(0, 0, 0, 0.8) !important; /* Change to your desired color */
+}
+
+.modal-content-wrapper {
+  pointer-events: auto; /* Enable interaction with buttons and other elements inside the modal */
+  width: fit-content;
+  height: fit-content;
+}
+
+.preview-nav-button {
+  opacity: 0.6;
+  transition: 0.5s;
+}
+
+.preview-nav-button:hover{
+  opacity: 1;
+}
+
+.control-button{
+  color: white;
+  font-size: 20px;
+  padding: 10px;
+  border-radius: 5px;
+  transition: 0.4s;
+}
+
+.control-button:hover{
+  background: rgba(255, 255, 255, 0.201);
+}
+
+.tools{
+  background: rgb(19, 18, 18);
+  border-radius: 5px;
+}
+
+.ant-spin-dot-item {
+  background-color: #68daf6 !important;
+  font-size: larger; 
+} 

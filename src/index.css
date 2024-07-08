@@ -35,6 +35,28 @@ h1 {
   line-height: 1.1;
 }
 
+::-webkit-scrollbar{
+  width: 15px;
+  background: #ffffff37;
+  border-radius: 30px;
+}
+
+::-webkit-scrollbar-track{
+  background: rgba(163, 218, 248, 0.31);
+  border-radius: 30px;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #23599c;
+  border-radius: 30px;
+  transition: color 2s  ;
+}
+
+::-webkit-scrollbar-thumb:hover { 
+  box-shadow:inset 0px 10px 10px #1a1a1a5c;
+}
+
 button {
   border-radius: 8px;
   border: 1px solid transparent;
@@ -53,6 +75,7 @@ button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
+
 
 @media (prefers-color-scheme: light) {
   :root {

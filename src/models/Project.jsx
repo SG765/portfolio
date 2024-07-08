@@ -5,17 +5,17 @@ export default class Project{
 
     constructor(
         name= '',
+        shortDesc='',
         desc='',
         startDate=null,
         endDate=null,
-        shortDesc='',
         repo='',
         deploy='',
         cover=''
     ){
         this.name=name;
-        this.desc=desc;
         this.shortDesc=shortDesc;
+        this.desc=desc;
         this.startDate = startDate instanceof Date ? startDate : startDate.toDate(); // change to date
         this.endDate = endDate instanceof Date ? endDate : endDate.toDate(); // change to date
         this.repo=repo;
@@ -23,10 +23,10 @@ export default class Project{
         this.cover=cover;
     }
 
-    static async POST_project ( name, shortDesc, desc, startDate,endDate, repo, deploy, cover ) {
+    static async POST_project ( name, shortDesc, desc, startDate, endDate, repo, deploy, cover ) {
         try {
             //create  instance
-            const project = new Project( name, shortDesc, desc, startDate,endDate, repo, deploy, cover ); 
+            const project = new Project( name, shortDesc, desc, startDate, endDate, repo, deploy, cover ); 
 
             //create collection ref 
             const coll_ref = collection ( db, 'projects');
@@ -167,8 +167,7 @@ export default class Project{
     }
 
     static async update_project(id, name, shortDesc, desc, startDate, endDate, repo, deploy, cover, images, shown){
-        let doc_snapshot; 
-
+        let doc_snapshot;  
         try{
             await runTransaction( db, async ( transaction ) => {
                 const doc_ref= doc(db, "projects", id)
@@ -213,6 +212,37 @@ export default class Project{
             console.log("Error updating project: ", error)
         }
         
+    }
+
+    static async DELETE_project(id){
+        try{
+            const doc_ref= doc(db, "projects", id)
+            const snap = getDoc(doc_ref)
+
+            if (!snap){
+                console.error ( 'project doc does not exist', error);
+                return "No such project";
+            }
+
+            // Delete all documents in the "images" subcollection
+            const imagesCollectionRef = collection(doc_ref, "images");
+            const imagesQuery = query(imagesCollectionRef);
+            const imagesSnap = await getDocs(imagesQuery);
+
+            const deleteImagePromises = imagesSnap.docs.map(async (imageDoc) => {
+                await deleteDoc(imageDoc.ref);
+            });
+
+            await Promise.all(deleteImagePromises);
+
+
+            await deleteDoc(doc_ref)
+
+            return {status: 200, body: `Project Deleted`}
+
+        }catch(e){
+            console.log("Error deleting project: ", e)
+        }
     }
 
 }

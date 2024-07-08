@@ -2,7 +2,7 @@
 import {useState, useEffect} from 'react'
 import DOMPurify from 'dompurify';
 import Navigation from '../components/Navigation';
-import { Button, Row } from 'antd';
+import { Button, Row, Spin, Flex } from 'antd';
 import AddProjectModal from '../components/AddProjectModal';
 import { get_all_projects, get_all_display_projects } from '../controllers/Project';
 import ProjectCard from '../components/ProjectCard';
@@ -14,6 +14,7 @@ function Projects({loggedIn}){
     const [isAddModalOpen, setIsAddModalOpen]= useState(false);
     const [projects, setProjects]= useState([])
     const [isEditModalOpen, setEditModalOpen] = useState(Array(projects.length).fill(false));
+    const [loading, setLoading] = useState(false)
 
     const handleAddProjectOpen=()=>{
         setIsAddModalOpen(true);
@@ -25,43 +26,60 @@ function Projects({loggedIn}){
         loggedIn= !!authToken;
       }, []);
 
-    useEffect(() =>{
-        async function fetchProjects(){
-            let data;
-            if(loggedIn){
-                data= await get_all_projects()
-            }else{
-                data= await get_all_display_projects() 
-            } 
-            
-            if(data.body != null){
-                setProjects(data.body) 
-            }
+    const fetchProjects = async () => {
+        let data;
+
+        setLoading(true)
+        if(loggedIn){
+            data= await get_all_projects()
+        }else{
+            data= await get_all_display_projects() 
+        } 
+        
+        if(data.body != null){
+            setProjects(data.body) 
         }
+        setLoading(false)
+    }
+
+    useEffect(() =>{
         fetchProjects();
     },[]);
+
+    const handleAddProject = async () => {
+        await fetchProjects(); 
+      };
+    
+      const handleDeleteProject = async (projectId) => {
+        setProjects(projects.filter(project => project.id !== projectId));
+        await fetchProjects();
+      };
+ 
       
     return (
         <div className='page' style={{ width:"85vw", minHeight:"86vh", zIndex:1, margin: 'auto'
         }}> 
         { loggedIn && (
             <div><Button style={{justifySelf: 'end'}} onClick={handleAddProjectOpen}>Add Project</Button>
-            <AddProjectModal open={isAddModalOpen} onCancel={() => setIsAddModalOpen(false)}/>
+            <AddProjectModal open={isAddModalOpen} onCancel={() => setIsAddModalOpen(false)} onAdd={handleAddProject}/>
             </div>
         )}
 
         <Row style={{margin: "20px", justifyContent: "center"}}>
-            {projects && (
-                /*testing out getting data */
-                projects.map((data, index)=> (
-                    <>
-                    <ProjectCard key={index} index={index} projData={data} loggedIn={loggedIn} />
-                    
-                    </>
+            {loading ? ( <Flex vertical style={{padding:"50px"}}><Spin classname="spinner" size="large" /></Flex>) :(
+                <>{projects && (
+                    /*testing out getting data */
+                    projects.map((data, index)=> (
+                        <>
+                        <ProjectCard key={data.id} index={index} projData={data} loggedIn={loggedIn} onDelete={handleDeleteProject}/>
+                        
+                        </>
+                    )
+                    )
                 )
-                )
-            )
-            }
+                }</>
+            )}
+            
         </Row>
 
         </div>
