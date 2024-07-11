@@ -1,5 +1,5 @@
 import '../cssfiles/projects.css'
-import { useParams} from 'react-router-dom'; 
+import { useNavigate, useParams} from 'react-router-dom'; 
 import { useMediaQuery } from 'react-responsive';
 import { useState, useEffect, useRef } from 'react'
 import { get_proj_by_name } from '../controllers/Project';
@@ -10,6 +10,7 @@ import { Quill, toolbarOptions } from '../quill'; // Import the customized Quill
 import 'quill/dist/quill.snow.css'; // Import Quill stylesheet
 import { update_project } from '../controllers/Project';
 import { TransformWrapper, TransformComponent, useControls } from 'react-zoom-pan-pinch';
+import { motion, Reorder } from 'framer-motion'; 
 
 const { TextArea } = Input;
 const { Dragger } = Upload;
@@ -26,9 +27,24 @@ function ProjDetails({loggedIn}){
     const quillInitializedRef= useRef(false);
     const quillRef = useRef(null)
     const [loading, setLoading] = useState(false)
+    const [saveLoading, setSaveLoading] = useState(false)
+    const navigate= useNavigate()
+    const [editImages, setEditImages] = useState(projData ? projData.images : [])
 
     const [currentPreview, setCurrentPreview] = useState(0); // State to track current previewed image index
     const [previewOpen, setPreviewOpen]= useState(false)
+
+    const pageVariants = {
+        initial: { opacity: 0, scale: 0.4 },
+        in: { opacity: 1, scale: 1 },
+        out: { opacity: 0, scale: 0.4 }
+    };
+
+    const pageTransition = {
+        type: "tween",
+        ease: "anticipate",
+        duration: 0.5
+    };
 
     const handleImageClick = (index) => {
         setCurrentPreview(index); // Update state when an image is clicked 
@@ -80,6 +96,12 @@ function ProjDetails({loggedIn}){
         const authToken = localStorage.getItem('authToken');
         loggedIn= !!authToken;
       }, []);
+
+      useEffect(() => {
+        if(projData){
+        setEditImages(projData.images)}
+      }, [projData]);
+
 
       useEffect(() => {
         if (editMode && editorRef) { 
@@ -169,23 +191,31 @@ function ProjDetails({loggedIn}){
 
     const handleSaveClick = async () => {
         if (quillRef.current) {
+            setSaveLoading(true)
             const updatedDesc = quillRef.current.root.innerHTML;
+            const imagesToSave = editImages.map(({ id, ...rest }) => rest); //remove id field that was added for reordering
+
             setProjData(prevData => ({
                 ...prevData,
-                desc: updatedDesc
+                desc: updatedDesc,
+                images: imagesToSave
             })); 
             setDescription(updatedDesc); 
             const shown = projData.shown !== undefined ? projData.shown : false; //for cases where shown is yet to be defined
 
-            const response= await update_project(projData.id, projData.name, projData.shortDesc, updatedDesc, projData.startDate, projData.endDate, projData.repo, projData.deploy, projData.cover, projData.images, shown)
-            console.log(response.body)
+            const response= await update_project(projData.id, projData.name, projData.shortDesc, updatedDesc, projData.startDate, projData.endDate, projData.repo, projData.deploy, projData.cover, imagesToSave, shown)
+            setSaveLoading(false)
+            message.success(response.body)
         }
         
         setEditMode(false);
     };
 
     const handleGoBack = () => {
-        window.history.back();
+        if(editMode){ 
+            setEditMode(false);
+        }else{
+        window.history.back();}
       };
 
     const fileInputRef = useRef(null);
@@ -252,25 +282,23 @@ function ProjDetails({loggedIn}){
           newImages.splice(index, 1); // Remove the image at the specified index
           return { ...prevData, images: newImages };
         });
-      };
-      
-    
-
+      };  
+ 
     return (
-        <div className='details-page' >
-            {loading ? ( <Flex vertical style={{padding:"50px"}}><Spin classname="spinner" size="large" /></Flex> ) : (<>
+        <div className='details-page'>
+            {loading ? ( <Flex vertical style={{padding:"50px"}}><Spin classname="spinner" size="large" /></Flex> ) : (<motion.div initial="initial"  variants={pageVariants} animate="in" exit="out" transition={pageTransition}>
             {loggedIn && 
             (
                 <div style={{ textAlign: 'end', marginRight: '3rem' }}>
                     {!editMode ? (
                         <Button onClick={handleEditClick}>Edit</Button>
                     ) : (
-                        <Button onClick={handleSaveClick}>Save</Button>
+                        <Button onClick={handleSaveClick}><Spin spinning={saveLoading} style={{marginRight: "10px"}}/>Save</Button>
                     )}
                 </div>
             )}
             <Flex  gap={gap}>
-                <div><ArrowLeftOutlined className='back-arrow' onClick={handleGoBack}/> </div>
+                <motion.div exit={{x:"-100vw"}}><ArrowLeftOutlined className='back-arrow' onClick={handleGoBack}/> </motion.div>
             {projData && (
                 <div style={{width: "90%"}} >
                     <Flex gap="large" style={{justifyContent: "space-between"}}>
@@ -308,16 +336,18 @@ function ProjDetails({loggedIn}){
                         </Carousel>): (
                             <>
                             <Flex style={{padding: "10px", flexWrap: "wrap"}}> 
-                            {projData.images.map((image, index) => (
                             
-                                <div key={index} style={{padding: "10px"}}>
+                            <Reorder.Group axis="x" values={editImages} onReorder={setEditImages} style={{display: "flex", flexWrap: "wrap", listStyle:"none"}}>
+                            {editImages.map((image, index) => (
+                            
+                                <Reorder.Item key={image.id} value={image} style={{padding: "10px"}}>
                                     <div className="edit-img-container" onClick={() => setSelectedImageIndex(index)}>
                                         <img src={image.src} alt={`Slide ${index + 1}`} style={imgEditStyle} />
                                         <DeleteOutlined className="delete-icon" onClick={() => removeImg(index)}/>
                                     </div>
-                                </div> 
+                                </Reorder.Item> 
                                 
-                            ))}
+                            ))}</Reorder.Group>
                             
                             <Dragger {...dragger_props}  height="150px" style={{width: "200px", marginTop: "10px" }}> 
                                 <p className="ant-upload-text" style={{color:"white" }}>Click or drag file/s to this area to upload</p>
@@ -382,7 +412,7 @@ function ProjDetails({loggedIn}){
                 </div>
             )}
             </Flex> 
-        </>
+        </motion.div>
         )}
         </div>
     );

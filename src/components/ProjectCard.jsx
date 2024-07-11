@@ -3,7 +3,7 @@ import DOMPurify from 'dompurify';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { delete_project, toggle_show_project } from '../controllers/Project';
-import {Card, Image, Button, AutoComplete, Switch, Divider, message, Popconfirm} from 'antd'
+import {Card, Image, Button, AutoComplete, Switch, Divider, message, Popconfirm, Spin} from 'antd'
 import { EditOutlined, EllipsisOutlined, SettingOutlined, DeleteOutlined } from '@ant-design/icons';
 import {geekblue, blue, cyan, gold, yellow, purple} from '@ant-design/colors';
 import EditProjectModal from './EditProjectModal';
@@ -19,6 +19,7 @@ function ProjectCard({index, projData, loggedIn, onDelete}){
   const navigate= useNavigate();
   const [popDeleteOpen, setPopDeleteOpen] = useState(false);
   const [confirmLoading, setConfirmLoading] = useState(false);
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     // Check authentication status and update loggedIn state

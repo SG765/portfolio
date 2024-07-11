@@ -9,6 +9,7 @@ import { auth, db } from './firebase'
 import {onAuthStateChanged  } from "firebase/auth";
 import { message, Button } from 'antd';
 import ProjDetails from './pages/ProjDetails';
+import { AnimatePresence } from 'framer-motion';
 
 function App() { 
   const [loggedIn, setLoggedIn]= useState(false);
@@ -80,6 +81,7 @@ function App() {
       <BrowserRouter>
         <Navigation loggedIn={loggedIn}/>
         <div className="content">
+          <AnimatePresence mode="wait">
           <Routes>
             <Route path="/" element={<Projects loggedIn={loggedIn}/>} />
             <Route path="/projects" element={<Projects loggedIn={loggedIn} />} />
@@ -87,6 +89,7 @@ function App() {
             <Route path="/login" element={<Login loggedIn={loggedIn}/>} />
             <Route path="/projects/:name" element={<ProjDetails loggedIn={loggedIn} />} />
           </Routes>
+          </AnimatePresence>
         </div>
       </BrowserRouter>
     </div>

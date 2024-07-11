@@ -73,7 +73,7 @@ export default class Project{
                 const imagesSnapshot = await getDocs(imagesQuery);
 
                 let images = [];
-                imagesSnapshot.forEach((imageDoc) => {
+                imagesSnapshot.forEach((imageDoc) => { 
                     images.push(imageDoc.data());
                 });
 
@@ -123,8 +123,11 @@ export default class Project{
                 const imagesSnapshot = await getDocs(imagesQuery);
 
                 let images = [];
-                imagesSnapshot.forEach((imageDoc) => {
-                    images.push(imageDoc.data());
+                imagesSnapshot.forEach((imageDoc) => { 
+                    images.push({
+                        id: imageDoc.id, //add the id which would be used for reordering images
+                        ...imageDoc.data(),
+                    });
                 });
 
                 projectData.images = images;

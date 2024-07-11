@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Button, Form, Modal, Input, DatePicker, Upload, message } from 'antd';
+import { Button, Form, Modal, Input, DatePicker, Upload, message, Spin } from 'antd';
 import { Quill, toolbarOptions } from '../quill'; // Import the customized Quill setup
 import 'quill/dist/quill.snow.css'; // Import Quill stylesheet
 import { create_project } from '../controllers/Project';
@@ -14,6 +14,7 @@ const AddProjectModal = ({ open, onCancel, projData, mode, onAdd }) => {
   const quillInitializedRef= useRef(false);
   const quillRef = useRef(null)
   const [coverImg, setImage]= useState(null)
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     if (!quillInitializedRef.current && open) {
@@ -58,11 +59,11 @@ const AddProjectModal = ({ open, onCancel, projData, mode, onAdd }) => {
   // Function to handle form submission
   const onFinish = async(values) => {
     const quillContent = editorRef.current.querySelector('.ql-editor').innerHTML;
-    console.log('Quill content:', quillContent);
-    console.log('Form values:', values);
+    setLoading(true)
     const success= await create_project(values.name, values.shortDesc, quillContent, values.start, values.end, values.repo, values.deploy, coverImg)
     if(success.status === 200){  
         message.success(success.body)
+        setLoading(false)
         onAdd();
     }
     onCancel();
@@ -86,7 +87,7 @@ const AddProjectModal = ({ open, onCancel, projData, mode, onAdd }) => {
         Cancel
       </Button>,
       <Button key="submit" type="primary" onClick={handleOk}>
-        Submit
+        <Spin spinning={loading} style={{marginRight: "5px"}}></Spin>Submit
       </Button>
     ]}>
 

@@ -8,6 +8,7 @@ import { get_all_projects, get_all_display_projects } from '../controllers/Proje
 import ProjectCard from '../components/ProjectCard';
 import '../cssfiles/projects.css'
 import EditProjectModal from '../components/EditProjectModal';
+import { motion } from "framer-motion";
 
 
 function Projects({loggedIn}){
@@ -15,6 +16,43 @@ function Projects({loggedIn}){
     const [projects, setProjects]= useState([])
     const [isEditModalOpen, setEditModalOpen] = useState(Array(projects.length).fill(false));
     const [loading, setLoading] = useState(false)
+
+    const listVariants = {
+        loaded: { opacity: 1, transition: {
+            when: "beforeChildren",
+            staggerChildren: 0.15,
+          }, 
+        },
+        unloaded: { opacity: 0, transition: {
+            when: "afterChildren",
+          } 
+        },
+      }
+
+      const itemVariants = {
+        loaded: { opacity: 1, x: 0, transition:{type: "spring", damping: 12}
+
+         },
+        unloaded: { opacity: 0, x: -100 },
+      }
+
+      const pageVariants = {
+        initial: { 
+            opacity: 0,  
+        },
+        in: { 
+            opacity: 1,   
+        },
+        out: { 
+            opacity: 0,  height: 0
+        }
+    };
+
+    const pageTransition = {
+        type: "spring",
+        ease: "anticipate",
+        duration: 1
+    };
 
     const handleAddProjectOpen=()=>{
         setIsAddModalOpen(true);
@@ -57,8 +95,8 @@ function Projects({loggedIn}){
  
       
     return (
-        <div className='page' style={{ width:"85vw", minHeight:"86vh", zIndex:1, margin: 'auto'
-        }}> 
+        <motion.div className='page' style={{ width:"85vw", minHeight:"86vh", zIndex:1, margin: 'auto' 
+        }} initial="initial"  variants={pageVariants} animate="in" exit="out" transition={pageTransition}> 
         { loggedIn && (
             <div><Button style={{justifySelf: 'end'}} onClick={handleAddProjectOpen}>Add Project</Button>
             <AddProjectModal open={isAddModalOpen} onCancel={() => setIsAddModalOpen(false)} onAdd={handleAddProject}/>
@@ -67,22 +105,22 @@ function Projects({loggedIn}){
 
         <Row style={{margin: "20px", justifyContent: "center"}}>
             {loading ? ( <Flex vertical style={{padding:"50px"}}><Spin classname="spinner" size="large" /></Flex>) :(
-                <>{projects && (
+                <motion.div variants={listVariants} initial="unloaded" animate="loaded" style={{display:"flex", flexWrap: "wrap", justifyContent: "center"}}>{projects && (
                     /*testing out getting data */
                     projects.map((data, index)=> (
-                        <>
-                        <ProjectCard key={data.id} index={index} projData={data} loggedIn={loggedIn} onDelete={handleDeleteProject}/>
+                        <motion.div key={data.id} index={index} variants={itemVariants}>
+                            <ProjectCard key={data.id} index={index} projData={data} loggedIn={loggedIn} onDelete={handleDeleteProject}/>
                         
-                        </>
+                        </motion.div>
                     )
                     )
                 )
-                }</>
+                }</motion.div>
             )}
             
         </Row>
 
-        </div>
+        </motion.div>
     );
 }
 
