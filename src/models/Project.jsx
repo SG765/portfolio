@@ -78,6 +78,17 @@ export default class Project{
                 });
 
                 projectData.images = images;
+
+                const tagsQuery = query(collection(db, "projects", docSnapshot.id, "tags"));
+                const tagssSnapshot = await getDocs(tagsQuery);
+
+                let tags= []
+                tagssSnapshot.forEach((tagsDoc) =>{
+                    tags.push(tagsDoc.data())
+                });
+
+                projectData.tags = tags;
+
                 projects.push(projectData);
             }
         } 
@@ -131,6 +142,17 @@ export default class Project{
                 });
 
                 projectData.images = images;
+
+                const tagsQuery = query(collection(db, "projects", docSnapshot.id, "tags"));
+                const tagssSnapshot = await getDocs(tagsQuery);
+
+                let tags= []
+                tagssSnapshot.forEach((tagsDoc) =>{
+                    tags.push(tagsDoc.data())
+                });
+
+                projectData.tags = tags;
+
                 projects.push(projectData);
             }
         } 
@@ -169,7 +191,7 @@ export default class Project{
         
     }
 
-    static async update_project(id, name, shortDesc, desc, startDate, endDate, repo, deploy, cover, images, shown){
+    static async update_project(id, name, shortDesc, desc, startDate, endDate, repo, deploy, cover, images, tags, shown){
         let doc_snapshot;  
         try{
             await runTransaction( db, async ( transaction ) => {
@@ -207,6 +229,23 @@ export default class Project{
                     const imageDocRef = doc(imagesCollectionRef, `image${index}`);
                     transaction.set(imageDocRef, image);
                 });
+
+                 // Update tags 
+                 const tagsCollectionRef = collection(doc_ref, 'tags');
+
+                 // Delete existing to prevent dups
+                 const existingTagsSnapshot = await getDocs(tagsCollectionRef);
+                 existingTagsSnapshot.forEach((doc) => {
+                     transaction.delete(doc.ref);
+                 });
+ 
+                 // Add new tags to the subcollection
+                 tags.forEach((tag, index) => {
+                     const tagDocRef = doc(tagsCollectionRef, `tag${index}`);
+                     transaction.set(tagDocRef, tag);
+                 });
+
+
             })
 
 

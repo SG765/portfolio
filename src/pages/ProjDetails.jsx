@@ -3,6 +3,8 @@ import { useNavigate, useParams} from 'react-router-dom';
 import { useMediaQuery } from 'react-responsive';
 import { useState, useEffect, useRef } from 'react'
 import { get_proj_by_name } from '../controllers/Project';
+import TagCard from '../components/TagCard'
+import AddTagModal from '../components/AddTagModal';
 import {ArrowLeftOutlined, DeleteOutlined, PlusCircleOutlined, RightOutlined, LeftOutlined, PlusOutlined, MinusOutlined, FullscreenExitOutlined} from '@ant-design/icons'
 import { Divider, Flex, Carousel, Button, Input, message, Upload, Image, Modal, Spin } from 'antd';
 import DOMPurify from 'dompurify';
@@ -10,7 +12,7 @@ import { Quill, toolbarOptions } from '../quill'; // Import the customized Quill
 import 'quill/dist/quill.snow.css'; // Import Quill stylesheet
 import { update_project } from '../controllers/Project';
 import { TransformWrapper, TransformComponent, useControls } from 'react-zoom-pan-pinch';
-import { motion, Reorder } from 'framer-motion'; 
+import { motion, px, Reorder } from 'framer-motion'; 
 
 const { TextArea } = Input;
 const { Dragger } = Upload;
@@ -33,6 +35,7 @@ function ProjDetails({loggedIn}){
 
     const [currentPreview, setCurrentPreview] = useState(0); // State to track current previewed image index
     const [previewOpen, setPreviewOpen]= useState(false)
+    const [addTagOpen, setAddTagOpen] = useState(false)
 
     const pageVariants = {
         initial: { opacity: 0, scale: 0.4 },
@@ -147,11 +150,10 @@ function ProjDetails({loggedIn}){
     }, [editMode]);
 
     const contentStyle = {
-        height: 'fit-content',
+        height: '400px',
         color: '#fff',
-        lineHeight: '360px', 
         background: '#364d79',
-        margin: 'auto',  
+        margin: 'auto',   
       };
 
       const imgEditStyle = {
@@ -169,8 +171,12 @@ function ProjDetails({loggedIn}){
         color: '#fff',
         padding: '20px',
         borderRadius: '5px', 
-        width: "80%",
-        margin: "auto"
+        width: "80%", 
+        justifyContent: "center",
+        textAlign: "center",
+        margin: "auto",
+        overflowY: "auto",
+        height: '70px',
       };
 
       const Controls = () => {
@@ -203,7 +209,7 @@ function ProjDetails({loggedIn}){
             setDescription(updatedDesc); 
             const shown = projData.shown !== undefined ? projData.shown : false; //for cases where shown is yet to be defined
 
-            const response= await update_project(projData.id, projData.name, projData.shortDesc, updatedDesc, projData.startDate, projData.endDate, projData.repo, projData.deploy, projData.cover, imagesToSave, shown)
+            const response= await update_project(projData.id, projData.name, projData.shortDesc, updatedDesc, projData.startDate, projData.endDate, projData.repo, projData.deploy, projData.cover, imagesToSave, projData.tags, shown)
             setSaveLoading(false)
             message.success(response.body)
         }
@@ -283,6 +289,18 @@ function ProjDetails({loggedIn}){
           return { ...prevData, images: newImages };
         });
       };  
+
+    const handleOpenAddTagModal = () =>{ 
+        setAddTagOpen(true);
+    }
+
+    const handleAddTags = (selectedTags) => {
+        if (projData) {
+          const updatedTags = [...projData.tags, ...selectedTags];
+          setProjData({ ...projData, tags: updatedTags });
+        }
+        setAddTagOpen(false);
+      };
  
     return (
         <div className='details-page'>
@@ -318,14 +336,45 @@ function ProjDetails({loggedIn}){
                                 year: 'numeric', month: 'long', day: 'numeric'
                             }))})
                         </div>
-                    </Flex>
+                    </Flex> 
+                    <div className='tags-section'>
+                    {projData && (
+                        <>
+                        {editMode ? (
+                            <>
+                                <Button onClick={handleOpenAddTagModal}>Add Tag</Button>
+                                <AddTagModal projData={projData} onSubmit={handleAddTags} loggedIn={loggedIn} open={addTagOpen} onCancel={() => setAddTagOpen(false)}/>
+                                {
+                                projData.tags ? (
+                                    projData.tags.map((tag, index) =>(
+                                        <TagCard index={index} tagData={tag}/> 
+                                    ))
+                                ) : (
+                                        <div> No tags Found</div>
+                                    )}
+                                </>
+                            
+                        ) : (
+                            <>
+                            {
+                            projData.tags ? (
+                                projData.tags.map((tag, index) =>(
+                                    <TagCard index={index} tagData={tag}/> 
+                                ))
+                            ) : (
+                                    <div> No tags Found</div>
+                                )}
+                            </>
+                        )}
+                        </>
+                        )}
+                    </div>
                     <Divider style={{backgroundColor: "white", padding: "0", margin:"0"}} width="100%"/>
-                    
                     {!editMode ? (
                         <Carousel arrows autoplay autoplaySpeed={3000} style={{margin: "10px"}} >
                             {projData.images.map((image, index) => ( 
-                                <div key={index} style={{justifyItems: "center"}}>
-                                    <div style={{height: "300px", justifyContent: "centered"}}>
+                                <div key={index} style={{justifyItems: "center", height: "fit-content"}}>
+                                    <div style={{height: "400px", justifyContent: "centered", width: "auto"}}>
                                         <Image src={image.src} alt={`Slide ${index + 1}`} preview={{visible: false}} style={contentStyle} onClick={() => handleImageClick(index)}/>
                                     </div>
                                     <div style={descriptionStyle}>

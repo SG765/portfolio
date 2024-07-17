@@ -32,40 +32,68 @@
 }
 
 .card{
-    background-color: white;
+    background: rgb(94,143,215, 1);
     width: 400px;
-    max-width: 400px; 
+    max-width: 390px; 
     min-width: 350px;
     max-height: fit-content;
     position: relative;
     overflow: hidden;
     border-radius: 15px; 
+    border: rgba(255, 255, 255, 0) 1px solid;
     margin: 5px;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
-    transition: transform 0.3s ease-in-out;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.5);
+    transition: 0.3s ease-in-out; 
 }
 
-.card .ant-card-actions{
-    background-color: white;
-    z-index: 2;
+.card:hover{
+  box-shadow: 0px 0px 5px #00ccff;
+  border: 1px solid #00ccff;
+  scale: 1.05;
+  margin: 10px;
 }
 
 .card-title{
     font-size: large;
     font-family: Georgia;
     font-weight: bold;
+    background-color: rgb(13,24,121, 0.3); 
+    color: white;
 }
 
 .card .ant-card-body{
     padding: 2px; 
-    background-color: white;
+    background-color: rgba(0, 0, 0, 0);
+    border: none;
+}
+ 
+
+.card .card-content{
+  border: none;
+}
+
+.card-image{
+  border: none; 
 }
 
 .card-actions{
-    background-color: white; 
-    height: 50px;
-    justify-content: space-around;
-    margin-top: 10px;
+    background-color: rgba(0, 0, 0, 0); 
+    min-height: 40px; 
+    justify-content: center;
+    padding-top: 10px; 
+    border-radius: 0px 0 15px 15px;
+}
+
+.card-actions-button{
+  color:#061371;
+  font-size: 24px; 
+  margin-left:10; 
+  margin-right: 10;
+  transition: 0.2s;
+}
+
+.card-actions-button:hover{
+  color:#b9f1ff;
 }
 
 .card-overlay {
@@ -92,11 +120,11 @@
     transition: opacity 0.5s ease-in-out;
   }
   
-  .card-content:hover .card-overlay {
-    height: 200px; 
+  .card:hover .card-overlay {
+    height: 202px; 
   }
 
-  .card-content:hover .overlay-text{
+  .card:hover .overlay-text{
     opacity:1;
   }
 
@@ -151,7 +179,7 @@
     top: 10px;
     right: 10px; 
     cursor: pointer;
-    color: black; /* Optional: to make the delete icon stand out */
+    color: black !important; /* Optional: to make the delete icon stand out */
     transition: opacity 0.3s ease; 
     z-index: 2;
 } 
@@ -237,3 +265,27 @@
   background-color: #68daf6 !important;
   font-size: larger; 
 } 
+
+.display-switch{
+  margin-left: 5px;
+}
+
+.display-switch:hover{
+  box-shadow: #b9f1ff 0 0 7px;
+}
+ 
+.display-switch.on {
+  background-color: #2432a1 !important;
+}
+
+.display-switch.off {
+  background-color: #555c8fd3 !important;
+}
+
+.tags-section{
+  margin: auto;
+  width: 80%; 
+  padding-bottom: 5px;
+  display: flex;
+  flex-wrap: wrap;
+}

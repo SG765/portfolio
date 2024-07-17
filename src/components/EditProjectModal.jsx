@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import dayjs from 'dayjs';
-import { Button, Form, Modal, Input, DatePicker, Upload, Flex, message} from 'antd'; 
+import { Button, Form, Modal, Input, DatePicker, Upload, Flex, message, Spin} from 'antd'; 
 import { create_project, update_project } from '../controllers/Project';
 import { UploadOutlined } from '@ant-design/icons';
 
@@ -14,6 +14,7 @@ const EditProjectModal = ({ open, onCancel, projData, mode, onUpdate }) => {
   const [endDate, setEndDate] = useState('')
   const [coverImg, setImage]= useState(null)
   const [selectedImageIndex, setSelectedImageIndex]= useState(0);
+  const [loading, setLoading]= useState(false)
 
   useEffect(() => {
     if (projData) {
@@ -40,6 +41,7 @@ const EditProjectModal = ({ open, onCancel, projData, mode, onUpdate }) => {
 
   // Function to handle form submission
   const onFinish = async(values) => {   
+    setLoading(true)
     const updatedName = values.name || name;
     const updatedShortDesc = values.shortDesc || shortDesc;
     const updatedStartDate = values.start ? values.start.toDate() : startDate;
@@ -50,7 +52,7 @@ const EditProjectModal = ({ open, onCancel, projData, mode, onUpdate }) => {
       onUpdate(coverImg, updatedName, updatedShortDesc); // Call callback to update cover image
 
     }
-    
+    setLoading(false)
     message.success(success.body)
     onCancel();
   };
@@ -86,17 +88,18 @@ const EditProjectModal = ({ open, onCancel, projData, mode, onUpdate }) => {
       <Button key="cancel" onClick={onCancel}>
         Cancel
       </Button>,
-      <Button key="submit" type="primary" onClick={handleOk}>
+      <Button key="submit" type="primary" onClick={handleOk}><Spin spinning={loading} style={{marginRight: "10px"}}/>
         Submit
       </Button>
     ]}>
 
-      <Form form={form} onFinish={onFinish}>
+      <Form form={form} onFinish={onFinish} layout="vertical">
         <Form.Item label="Project Name" name="name" rules={[{ required: true, message: 'Please enter project name!' }]}>
           <Input placeholder="Enter Project Name" value={name} />
         </Form.Item> 
 
           {projData && (
+           <>Cover Image: 
             <Flex>
             {projData.images.map((image, index) => (
             <div key={index} style={{padding: "10px"}}>
@@ -111,10 +114,10 @@ const EditProjectModal = ({ open, onCancel, projData, mode, onUpdate }) => {
                             
           ))}
           </Flex>
-          )}
+          </>)}
         
-        <Form.Item label="Short Description" name="shortDesc" rules={[{ required: true, message: 'Please enter description!' }]}>
-          <Input placeholder="Enter Short Description" value={shortDesc}/>
+        <Form.Item layout="vertical" label="Short Description" name="shortDesc" rules={[{ required: true, message: 'Please enter description!' }]}>
+          <TextArea placeholder="Enter Short Description" value={shortDesc}/>
         </Form.Item>
         <Form.Item label="Start Date" name="start" rules={[{ required: true, message: 'Please select start date!' }]}>
           <DatePicker value={form.getFieldValue('start') ? dayjs(form.getFieldValue('start')) : null} />

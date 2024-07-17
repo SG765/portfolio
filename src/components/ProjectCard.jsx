@@ -29,16 +29,18 @@ function ProjectCard({index, projData, loggedIn, onDelete}){
 
   
   const onChangeShow = async(checked) => {
+
     setShowStatus(checked);
     const response= await toggle_show_project(projData.id)
     message.info(response.body)
   };
 
-  const handleEditClick = () =>{
+  const handleEditClick = (e) =>{
+    e.stopPropagation();
     setOpenEditModal(true)
   }
 
-  const navToDetails = () =>{
+  const navToDetails = (e) =>{ 
     navigate(`/projects/${name}`)
   }
 
@@ -49,6 +51,7 @@ function ProjectCard({index, projData, loggedIn, onDelete}){
   };
 
   const handleDelete = async () =>{
+    e.stopPropagation();
     setConfirmLoading(true);
     const id=projData.id
 
@@ -77,31 +80,30 @@ function ProjectCard({index, projData, loggedIn, onDelete}){
 
   if(!loggedIn){
     actionOptions=[
-      <>
-      <Button type="primary" onClick={navToDetails}>View Details</Button>
-      </>
+      <></>
     ]
   }else{
     actionOptions=[
       <>
-      Show: <Switch  checked={showStatus} onChange={onChangeShow} />
-      <Button type="primary" style={{marginLeft:20, marginRight:10}} onClick={navToDetails}>View Details</Button>
+      <div onClick={(e)=> e.stopPropagation()} style={{display: "flex", justifyContent: "center", fontWeight: "bold"}}>
+        Display: <Switch  checked={showStatus} onChange={onChangeShow} className={`display-switch  ${showStatus ? 'on' : 'off'}`}/>
       <Divider type="vertical"/>
-      <EditOutlined style={{fontSize:24, marginLeft:10, marginRight:10}} key="edit" onClick={handleEditClick}/>
+      <EditOutlined  className='card-actions-button' key="edit" onClick={handleEditClick}/>
       <Divider type="vertical"/>
       <Popconfirm title="Delete Project" description="Please confirm deletion" okType="danger" okText="Delete" icon={<DeleteOutlined/>}
       open={popDeleteOpen} onConfirm={handleDelete} onCancel={handleDeleteCancel}>
-        <DeleteOutlined style={{fontSize:24, marginLeft:10, marginRight:10}} onClick={() => showPopconfirm(projData.id)}/>
+        <DeleteOutlined className='card-actions-button' onClick={() => showPopconfirm(projData.id)}/>
       </Popconfirm>
+      </div>
       </>
     ];
   }
 
     return(
         <>
-            <Card className='card' hoverable>
+            <Card className='card' hoverable onClick={navToDetails}>
               <div className='card-content'>
-                <Image height={200} width={'100%'} preview={false} src={coverImg} fallback="" />
+                <Image height={200} preview={false} src={coverImg} fallback="" className='card-image'/>
                 <div className='card-title'>{name}</div>
 
                 <div className='card-overlay'>
