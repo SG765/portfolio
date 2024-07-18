@@ -1,7 +1,7 @@
 import '../cssfiles/tag.css';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom'; 
-import {Card, Image, Button, Divider, message, Spin, Modal, Form, Input, AutoComplete} from 'antd'
+import {Card, Image, Button, Divider, Select, message, Spin, Modal, Form, Input, AutoComplete} from 'antd'
 import { EditOutlined, EllipsisOutlined, SettingOutlined, DeleteOutlined } from '@ant-design/icons';
 import {geekblue, blue, cyan, gold, yellow, purple} from '@ant-design/colors';  
 import { create_tag, get_all_tags } from '../controllers/Tag';
@@ -30,6 +30,7 @@ function AddTagModal({projData, loggedIn, open, onCancel, onSubmit}){
 
     useEffect(() =>{
         fetchTags();
+        setAdditionalTags(projData.tags)
     },[]);
 
     const searchResult = (query) => {
@@ -55,17 +56,40 @@ function AddTagModal({projData, loggedIn, open, onCancel, onSubmit}){
     const handleSelect = (value) => {
         // Find the selected tag from the tagList
         const selectedTag = tagList.find(tag => tag.name === value);
-    
         if (selectedTag) {
-            // Check if the tag is already in the additionalTags array
-            const isAlreadySelected = additionalTags.some(tag => tag.name === selectedTag.name);
-    
-            if (!isAlreadySelected) {
-                setAdditionalTags(prevTags => [...prevTags, selectedTag]);
-            } else {
-                message.info('Tag already selected');
+            // Check if the tag has subtitles or not to know how to handle it
+            if(!selectedTag.subtitles || selectedTag.subtitles.length < 1){
+
+                //if it doesn't have subtitles and not already selected add to array else output msg
+                const isAlreadySelected = projData.tags.some(tag => tag.name === selectedTag.name); 
+        
+                if (!isAlreadySelected) {
+                    setAdditionalTags(prevTags => [...prevTags, {...selectedTag}]);
+                } else {
+                    message.info('Tag already selected');
+                }
+            }else{
+                //if it does have subtitles then find it on the additionaltags list and replace it
+                const existingTagIndex = additionalTags.findIndex(tag => tag.name === selectedTag.name);
+
+                if (existingTagIndex !== -1) {
+                    setAdditionalTags(prevTags => prevTags.map((tag, index) =>
+                        index === existingTagIndex ? { ...selectedTag, subtitles: [] } : tag
+                    ));
+                }else{
+                    setAdditionalTags(prevTags => [...prevTags, {...selectedTag, subtitles: []}]);
+                } 
             }
         }
+    };
+
+    const handleSubSelect = (tagName, sub) => {
+            setAdditionalTags(prevTags => prevTags.map(tag => {
+                if (tag.name === tagName) { 
+                    return { ...tag, subtitles: sub };
+                }
+                return tag;
+            }));
     };
 
     const handleCreateTag = async(values) =>{
@@ -94,8 +118,15 @@ function AddTagModal({projData, loggedIn, open, onCancel, onSubmit}){
         onSubmit(additionalTags)
     }
 
+    const handleDelete = (tagToRemove) =>{ 
+        const existingTagIndex = additionalTags.findIndex(tag => tag.name === tagToRemove.name);
+        const newTags = additionalTags.filter((tag, index)=> index !== existingTagIndex)
+
+        setAdditionalTags(newTags);
+    } 
+
     return(
-        <Modal open={open} onCancel={onCancel} height="100px" title={`Add Tag to ${projData.name}`}
+        <Modal open={open} onCancel={onCancel} height="100px" title={`Edit Tags on ${projData.name}`}
         footer={[
             <Button key="cancel" onClick={onCancel}>
               Cancel
@@ -110,11 +141,12 @@ function AddTagModal({projData, loggedIn, open, onCancel, onSubmit}){
                 <Input.Search enterButton />
             </AutoComplete>
 
-            <div>
-                Selected Tags:
+            <div>Selected Tags:</div>
+            <div style={{display: "flex", flexWrap: "wrap"}}>
+                
                 {additionalTags.length > 0 ? (additionalTags.map((tag, index)=>(
-                    <div style={{ display: 'flex', justifyContent: 'space-between' }}> 
-                        <TagCard  key={index} tagData={tag} ></TagCard>
+                    <div key={tag.id} style={{ display: 'flex', justifyContent: 'space-between' }}> 
+                        <TagCard  key={index} tagData={tag} dbTagData={tagList.find(t => t.name === tag.name)} selectMode={true} onSubSelection={handleSubSelect} onDelete={handleDelete}></TagCard>
                     </div>
                 ))) : ( <div>No Tags selected</div>)}
             </div>

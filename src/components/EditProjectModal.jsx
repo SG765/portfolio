@@ -45,9 +45,9 @@ const EditProjectModal = ({ open, onCancel, projData, mode, onUpdate }) => {
     const updatedName = values.name || name;
     const updatedShortDesc = values.shortDesc || shortDesc;
     const updatedStartDate = values.start ? values.start.toDate() : startDate;
-    const updatedEndDate = values.end ? values.end.toDate() : endDate;
+    const updatedEndDate = values.end ? values.end.toDate() : endDate; 
 
-    const success= await update_project(projData.id, updatedName, updatedShortDesc, projData.desc, updatedStartDate, updatedEndDate, projData.repo, projData.deploy, coverImg, projData.images, projData.shown)
+    const success= await update_project(projData.id, updatedName, updatedShortDesc, projData.desc, updatedStartDate, updatedEndDate, projData.repo, projData.deploy, coverImg, projData.images, projData.tags, projData.shown)
     if (success) {
       onUpdate(coverImg, updatedName, updatedShortDesc); // Call callback to update cover image
 
@@ -56,17 +56,6 @@ const EditProjectModal = ({ open, onCancel, projData, mode, onUpdate }) => {
     message.success(success.body)
     onCancel();
   };
-
-  /*const handleFileInputChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImage(reader.result);
-      };
-      reader.readAsDataURL(file);
-    }
-  };*/
 
   const imgEditStyle = {
     height: '100px',

@@ -289,3 +289,16 @@
   display: flex;
   flex-wrap: wrap;
 }
+
+.blue-button{
+  color: white;
+  background-color: #5475d8;
+  border: none;
+  transition: 0.2s;
+}
+
+.blue-button:hover{
+  background-color: #2432a1 !important;
+  color: #00ccff !important;
+  box-shadow: #00ccff 0px 0px 3px;
+}

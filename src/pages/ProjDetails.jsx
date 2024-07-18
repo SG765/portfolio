@@ -157,7 +157,7 @@ function ProjDetails({loggedIn}){
       };
 
       const imgEditStyle = {
-        height: '160px',
+        height: '100px',
         color: '#fff',
         lineHeight: '360px',
         textAlign: 'center',
@@ -218,7 +218,7 @@ function ProjDetails({loggedIn}){
     };
 
     const handleGoBack = () => {
-        if(editMode){ 
+        if(editMode === true){ 
             setEditMode(false);
         }else{
         window.history.back();}
@@ -274,13 +274,57 @@ function ProjDetails({loggedIn}){
           });
         };
 
-    const dragger_props ={
-        multiple: true,
-        showUploadList: false,
-          onDrop(e) {
-            handleFileDrop(e.dataTransfer.files)
-          },
-    }
+        const processedFiles = new Set();
+        const dragger_props = {
+            multiple: true,
+            showUploadList: false,
+            beforeUpload(file) {
+                const reader = new FileReader();
+                reader.onload = () => {
+                    const newImgs = [{
+                        src: reader.result,
+                        desc: ''
+                    }];
+                    setProjData(prevData => ({
+                        ...prevData,
+                        images: [...prevData.images, ...newImgs]
+                    }));
+                };
+                reader.readAsDataURL(file);
+                return false; // Prevent default upload behavior
+            },
+            onDrop(e) {
+                handleFileDrop(e);
+            },
+            onChange(e) {
+                const files = e.fileList.map((fileWrapper) => fileWrapper.originFileObj).filter(Boolean); 
+                const newImgs = [];
+                const existingFileSrcs = projData.images.map(img => img.src);
+        
+                Array.from(files).forEach((file) => {
+                    if (!processedFiles.has(file)) {
+                        processedFiles.add(file);
+                        const reader = new FileReader();
+                        reader.onload = () => {
+                            if (!existingFileSrcs.includes(reader.result)) {
+                                newImgs.push({
+                                    src: reader.result,
+                                    desc: '',
+                                });
+                            }
+                            if (newImgs.length === files.length) {
+                                setProjData((prevData) => ({
+                                    ...prevData,
+                                    images: [...prevData.images, ...newImgs],
+                                }));
+                            }
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                });
+            }
+        };
+        
 
     const removeImg = (index) => {
         setProjData(prevData => {
@@ -294,9 +338,8 @@ function ProjDetails({loggedIn}){
         setAddTagOpen(true);
     }
 
-    const handleAddTags = (selectedTags) => {
+    const handleAddTags = (updatedTags) => {
         if (projData) {
-          const updatedTags = [...projData.tags, ...selectedTags];
           setProjData({ ...projData, tags: updatedTags });
         }
         setAddTagOpen(false);
@@ -304,14 +347,14 @@ function ProjDetails({loggedIn}){
  
     return (
         <div className='details-page'>
-            {loading ? ( <Flex vertical style={{padding:"50px"}}><Spin classname="spinner" size="large" /></Flex> ) : (<motion.div initial="initial"  variants={pageVariants} animate="in" exit="out" transition={pageTransition}>
+            {loading ? ( <Flex vertical style={{padding:"50px"}}><Spin className="spinner" size="large" /></Flex> ) : (<motion.div initial="initial"  variants={pageVariants} animate="in" exit="out" transition={pageTransition}>
             {loggedIn && 
             (
                 <div style={{ textAlign: 'end', marginRight: '3rem' }}>
                     {!editMode ? (
-                        <Button onClick={handleEditClick}>Edit</Button>
+                        <Button onClick={handleEditClick} className='blue-button'>Edit</Button>
                     ) : (
-                        <Button onClick={handleSaveClick}><Spin spinning={saveLoading} style={{marginRight: "10px"}}/>Save</Button>
+                        <Button onClick={handleSaveClick} className='blue-button'><Spin spinning={saveLoading} style={{marginRight: "10px"}}/>Save</Button>
                     )}
                 </div>
             )}
@@ -322,8 +365,7 @@ function ProjDetails({loggedIn}){
                     <Flex gap="large" style={{justifyContent: "space-between"}}>
                         <div className='proj-title'>
                         {editMode ? (
-                                    <Input
-                                        value={projData.name}
+                                    <Input value={projData.name}
                                         onChange={e => setProjData({ ...projData, name: e.target.value })}
                                     />
                                 ) : (
@@ -341,25 +383,25 @@ function ProjDetails({loggedIn}){
                     {projData && (
                         <>
                         {editMode ? (
-                            <>
-                                <Button onClick={handleOpenAddTagModal}>Add Tag</Button>
+                            <div style={{display: "flex", flexWrap:"wrap", justifyContent: "center"}}>
                                 <AddTagModal projData={projData} onSubmit={handleAddTags} loggedIn={loggedIn} open={addTagOpen} onCancel={() => setAddTagOpen(false)}/>
                                 {
                                 projData.tags ? (
                                     projData.tags.map((tag, index) =>(
-                                        <TagCard index={index} tagData={tag}/> 
+                                        <TagCard key={tag.id} index={index} tagData={tag}/> 
                                     ))
                                 ) : (
                                         <div> No tags Found</div>
                                     )}
-                                </>
+                                <Button style={{alignSelf: "flex-start"}} onClick={handleOpenAddTagModal} className='blue-button'>Edit Tags</Button>
+                            </div>
                             
                         ) : (
                             <>
                             {
                             projData.tags ? (
                                 projData.tags.map((tag, index) =>(
-                                    <TagCard index={index} tagData={tag}/> 
+                                    <TagCard key={tag.id} index={index} tagData={tag}/> 
                                 ))
                             ) : (
                                     <div> No tags Found</div>
@@ -374,7 +416,7 @@ function ProjDetails({loggedIn}){
                         <Carousel arrows autoplay autoplaySpeed={3000} style={{margin: "10px"}} >
                             {projData.images.map((image, index) => ( 
                                 <div key={index} style={{justifyItems: "center", height: "fit-content"}}>
-                                    <div style={{height: "400px", justifyContent: "centered", width: "auto"}}>
+                                    <div style={{height: "400px", justifyContent: "centered", width: "auto" }}>
                                         <Image src={image.src} alt={`Slide ${index + 1}`} preview={{visible: false}} style={contentStyle} onClick={() => handleImageClick(index)}/>
                                     </div>
                                     <div style={descriptionStyle}>
@@ -390,7 +432,7 @@ function ProjDetails({loggedIn}){
                             {editImages.map((image, index) => (
                             
                                 <Reorder.Item key={image.id} value={image} style={{padding: "10px"}}>
-                                    <div className="edit-img-container" onClick={() => setSelectedImageIndex(index)}>
+                                    <div className="edit-img-container" onClick={() => setSelectedImageIndex(index)} style={{ border: selectedImageIndex === index ? '2px white blue' : 'none'}}>
                                         <img src={image.src} alt={`Slide ${index + 1}`} style={imgEditStyle} />
                                         <DeleteOutlined className="delete-icon" onClick={() => removeImg(index)}/>
                                     </div>
