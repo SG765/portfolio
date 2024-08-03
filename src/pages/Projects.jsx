@@ -104,7 +104,7 @@ function Projects({loggedIn}){
         )}
 
         <Row style={{margin: "20px", justifyContent: "center"}}>
-            {loading ? ( <Flex vertical style={{padding:"50px"}}><Spin classname="spinner" size="large" /></Flex>) :(
+            {loading ? ( <Flex vertical style={{padding:"50px"}}><Spin className="spinner" size="large" /></Flex>) :(
                 <motion.div variants={listVariants} initial="unloaded" animate="loaded" style={{display:"flex", flexWrap: "wrap", justifyContent: "center"}}>{projects && (
                     /*testing out getting data */
                     projects.map((data, index)=> (

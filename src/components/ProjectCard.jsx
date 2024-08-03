@@ -1,10 +1,11 @@
 import '../cssfiles/projects.css';
 import DOMPurify from 'dompurify';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
+import TagCard from './TagCard';
 import { useNavigate } from 'react-router-dom';
 import { delete_project, toggle_show_project } from '../controllers/Project';
-import {Card, Image, Button, AutoComplete, Switch, Divider, message, Popconfirm, Spin} from 'antd'
-import { EditOutlined, EllipsisOutlined, SettingOutlined, DeleteOutlined } from '@ant-design/icons';
+import {Card, Image, Flex, Button, AutoComplete, Switch, Divider, message, Popconfirm, Spin} from 'antd'
+import { EditOutlined, EllipsisOutlined, SettingOutlined, DeleteOutlined, DownOutlined, UpOutlined } from '@ant-design/icons';
 import {geekblue, blue, cyan, gold, yellow, purple} from '@ant-design/colors';
 import EditProjectModal from './EditProjectModal';
 const { Meta } = Card;
@@ -17,9 +18,8 @@ function ProjectCard({index, projData, loggedIn, onDelete}){
   const [name, setName] = useState(projData.name)
   const [shortDesc, setShortDesc] = useState(projData.shortDesc)
   const navigate= useNavigate();
-  const [popDeleteOpen, setPopDeleteOpen] = useState(false);
-  const [confirmLoading, setConfirmLoading] = useState(false);
-  const [loading, setLoading] = useState(false)
+  const [popDeleteOpen, setPopDeleteOpen] = useState(false); 
+  const [showAllTags, setShowAllTags] = useState(false);
 
   useEffect(() => {
     // Check authentication status and update loggedIn state
@@ -27,7 +27,12 @@ function ProjectCard({index, projData, loggedIn, onDelete}){
     loggedIn= !!authToken;
   }, []);
 
-  
+
+  const toggleTagsVisibility = (e) => {
+    e.stopPropagation()
+    setShowAllTags(!showAllTags);
+  };
+
   const onChangeShow = async(checked) => {
 
     setShowStatus(checked);
@@ -75,13 +80,35 @@ function ProjectCard({index, projData, loggedIn, onDelete}){
   const handleDeleteCancel = () => {
     setPopDeleteOpen(false);
   };
+ 
 
   let actionOptions=[];
 
   if(!loggedIn){
-    actionOptions=[
-      <></>
-    ]
+    const displayedTags = projData.tags.slice(0, 4); // Show only first 4 tags
+    const hiddenTags = projData.tags.slice(4); // Remaining tags
+
+    actionOptions = [
+      <Flex wrap>
+        <div className="tag-container">
+          {displayedTags.map((tag) => (
+            <TagCard key={tag.id} tagData={tag} />
+          ))}
+          {hiddenTags.length > 0 && !showAllTags && ( 
+              <DownOutlined className="arrow-button" onClick={(e) => toggleTagsVisibility(e)}/>  
+          )}
+          {hiddenTags.length > 0 && showAllTags && (
+            <>
+              {hiddenTags.map((tag) => (
+                <TagCard key={tag.id} tagData={tag} />
+              ))} 
+                <UpOutlined className="arrow-button" onClick={(e) => toggleTagsVisibility(e)}/>  
+            </>
+          )}
+        </div>
+      </Flex>
+      ];
+
   }else{
     actionOptions=[
       <>
