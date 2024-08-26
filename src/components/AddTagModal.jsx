@@ -96,11 +96,12 @@ function AddTagModal({projData, loggedIn, open, onCancel, onSubmit}){
         setLoading(true)
         const response= await create_tag(values.name, values.icon)
         if(response.status === 200){  
-            message.success(success.body)
+            message.success(response.body)
             setLoading(false)
+            
         }
         if(response.status === 400){  
-            message.error(success.body)
+            message.error(response.body)
             setLoading(false)
         }  
     }
@@ -126,7 +127,7 @@ function AddTagModal({projData, loggedIn, open, onCancel, onSubmit}){
     } 
 
     return(
-        <Modal open={open} onCancel={onCancel} height="100px" title={`Edit Tags on ${projData.name}`}
+        <Modal open={open} onCancel={onCancel} width= "50vw" title={`Edit Tags on ${projData.name}`}
         footer={[
             <Button key="cancel" onClick={onCancel}>
               Cancel
@@ -137,11 +138,11 @@ function AddTagModal({projData, loggedIn, open, onCancel, onSubmit}){
           ]}
         >
 
-            <AutoComplete options={options} onSelect={handleSelect} onSearch={handleSearch} placeholder="Enter Name to search tag">
-                <Input.Search enterButton />
+            <AutoComplete options={options} style={{width:"100%"}} onSelect={handleSelect} onSearch={handleSearch} placeholder="Enter tag to search">
+                <Input.Search enterButton style={{width:"50%"}}/>
             </AutoComplete>
 
-            <div>Selected Tags:</div>
+            <div style={{marginTop: "20px", fontWeight: "bold"}}>Selected Tags:</div>
             <div style={{display: "flex", flexWrap: "wrap"}}>
                 
                 {additionalTags.length > 0 ? (additionalTags.map((tag, index)=>(
@@ -151,7 +152,7 @@ function AddTagModal({projData, loggedIn, open, onCancel, onSubmit}){
                 ))) : ( <div>No Tags selected</div>)}
             </div>
 
-            <div style={{marginTop: "40px"}}>Need a new tag? Add it here: </div>
+            <div style={{marginTop: "40px", fontWeight: "bold", fontSize: "16px"}}>Need a new tag? Add it here: </div>
             <Form form={form} onFinish={handleCreateTag}>
                 <Form.Item label="Name:" name="name">
                     <Input ></Input>

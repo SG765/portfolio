@@ -221,9 +221,11 @@ function ProjDetails({loggedIn}){
             })); 
             setDescription(updatedDesc); 
             const shown = projData.shown !== undefined ? projData.shown : false; //for cases where shown is yet to be defined
-
             const response= await update_project(projData.id, projData.name, projData.shortDesc, updatedDesc, projData.startDate, projData.endDate, projData.repo, projData.deploy, projData.cover, imagesToSave, projData.tags, shown)
             setSaveLoading(false)
+            if(response){
+                navigate(`/projects/${projData.name}`);
+            }
             message.success(response.body)
         }
         
@@ -370,7 +372,7 @@ function ProjDetails({loggedIn}){
       };  
 
       const toggleImageDisplay = (index) => {
-        console.log("toggle")
+        message.info("Image display changed")
         setProjData(prevData => {
             const newImages = [...prevData.images];
             newImages[index].show = !newImages[index].show;
@@ -472,7 +474,7 @@ function ProjDetails({loggedIn}){
                     </div>
                     <Divider style={{backgroundColor: "white", padding: "0", margin:"0"}} width="100%"/>
                     {!editMode ? (
-                        <Carousel arrows autoplay autoplaySpeed={3000} style={{margin: "10px"}} >
+                        <Carousel arrows autoplay autoplaySpeed={5000} style={{margin: "10px"}} >
                             {filteredImages.map((image, index) => ( 
                                 <div key={index} style={{justifyItems: "center", height: "fit-content"}}>
                                     <div style={{height: "400px", justifyContent: "centered", width: "auto" }}>
@@ -487,9 +489,9 @@ function ProjDetails({loggedIn}){
                             <>
                             <Flex style={{padding: "10px", flexWrap: "wrap"}}> 
                             
-                            <Reorder.Group axis="x" values={editImages} onReorder={setEditImages} style={{ display: "flex", flexWrap: "wrap", listStyle: "none" }}>
+                            <Reorder.Group axis="x" values={editImages} onReorder={setEditImages} style={{height: "fit-content", display: "flex", maxWidth: "80vw", overflowX: "scroll", justifyContent: "start", listStyle: "none" }}>
                                 {editImages.map((image, index) => (
-                                    <Reorder.Item key={image.id} value={image} style={{ padding: "10px" }}>
+                                    <Reorder.Item key={image.id} value={image} style={{ padding: "10px", cursor: "grab", boxSizing: "border-box" }}>
                                         <div className="edit-img-container" onClick={(event) => handleEditImageClick(index, event)} style={{ border: selectedImageIndex === index ? '2px white blue' : 'none' }}>
                                             <img src={image.src} alt={`Slide ${index + 1}`} style={imgEditStyle} />
                                             {image.show ? (
@@ -536,7 +538,10 @@ function ProjDetails({loggedIn}){
                                 <div key={currentPreview} style={{width: "90vw", height: "94vh", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden",}}>
                                         <TransformWrapper centerOnInit initialScale={1} style={{width: "90vw", height: "100vh", margin: "auto" }} >
                                             <TransformComponent wrapperStyle={{ width: "100%", height: "100%"}}>
+                                                <div>
                                                 <Image className="modal-content-wrapper" src={filteredImages[currentPreview]?.src} alt={`Slide ${currentPreview + 1}`} preview={false} style={contentStyle} margin= "auto" />
+                                                <div style={{color: "white", align: "center", backgroundColor: "black", width: "100%", padding: "2px", margin: "10px"}}>{filteredImages[currentPreview]?.desc}</div>
+                                                </div>
                                             </TransformComponent>
                                             <div className="modal-content-wrapper" style={{position: "absolute", bottom: "10px", left: "50%", transform: "translateX(-50%)", zIndex: 1, }}>
                                                 <Controls/>
