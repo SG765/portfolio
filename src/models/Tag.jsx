@@ -49,12 +49,32 @@ export default class Tag{
             const snap = getDoc(doc_ref)
 
             if (!snap){
-                console.error ( 'project doc does not exist', error);
-                return "No such project";
+                console.error ( 'tag doc does not exist', error);
+                return "No such tag";
             } 
 
             await deleteDoc(doc_ref)
 
+
+        // remove the tag from all projects'
+        const projects_ref = collection(db, "projects");
+        const projectSnapshot = await getDocs(projects_ref);
+
+        projectSnapshot.forEach(async (projectDoc) => {
+            const projectID = projectDoc.id;
+            const projectTagsRef = collection(db, "projects", projectID, "tags");
+ 
+            const projectTagSnapshot = await getDocs(projectTagsRef);
+            projectTagSnapshot.forEach(async (tagDoc) => {
+                const projectTagData = tagDoc.data();
+
+                if (projectTagData.id === id) {
+                    // If the tag matches, delete it from the project
+                    const tagToDeleteRef = doc(db, "projects", projectID, "tags", tagDoc.id);
+                    await deleteDoc(tagToDeleteRef); 
+                }
+            });
+        });
             return {status: 200, body: `Tag Deleted from Database`}
 
         }catch(e){
@@ -78,6 +98,15 @@ export default class Tag{
         } 
 
         return {status: 200, body: tags};
+    }
+
+    static async UPDATE_tag(id, name, icon){
+        let doc_snap;
+        try{
+            //to be continued
+        }catch (e){
+            console.log(e)
+        }
     }
 
 

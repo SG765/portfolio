@@ -23,8 +23,8 @@ function ProjDetails({loggedIn}){
     const [projData, setProjData] = useState(null);
     const [desc, setDescription] = useState(null)
     const [selectedImageIndex, setSelectedImageIndex] = useState(0);
-    const startDate = projData ? projData.startDate.toDate() : null;
-    const endDate = projData ? projData.endDate.toDate() : null;
+    const startDate = projData ? projData.startDate : null;
+    const endDate = projData ? projData.endDate : null;
     const [editMode, setEditMode] = useState(false);
     const editorRef = useRef(null);
     const quillInitializedRef= useRef(false);
@@ -432,11 +432,10 @@ function ProjDetails({loggedIn}){
                                     projData.name
                                 )}
                         </div>
-                        <div style={{alignSelf: 'center', fontSize: '14px', fontStyle: "italic", fontFamily: "Times New Roman"}}>({startDate && (startDate.toLocaleDateString('en-UK', {
-                            month: 'long', day: 'numeric'
-                            }))} -  {endDate && (endDate.toLocaleDateString('en-UK', {
-                                year: 'numeric', month: 'long', day: 'numeric'
-                            }))})
+                        <div style={{alignSelf: 'center', fontSize: '14px', fontStyle: "italic", fontFamily: "Times New Roman"}}>(
+                            {startDate === endDate ? startDate : `${startDate} - ${endDate}`}
+                            
+                            )
                         </div>
                     </Flex> 
                     <div className='tags-section'>

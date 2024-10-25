@@ -88,17 +88,17 @@ function Projects({loggedIn}){
         await fetchProjects(); 
       };
     
-      const handleDeleteProject = async (projectId) => {
-        setProjects(projects.filter(project => project.id !== projectId));
-        await fetchProjects();
-      };
+    const handleDeleteProject = async (projectId) => {
+    setProjects(projects.filter(project => project.id !== projectId));
+    await fetchProjects();
+    };
  
       
     return (
         <motion.div className='page' style={{ width:"85vw", minHeight:"86vh", zIndex:1, margin: 'auto' 
         }} initial="initial"  variants={pageVariants} animate="in" exit="out" transition={pageTransition}> 
         { loggedIn && (
-            <div><Button style={{justifySelf: 'end'}} className='blue-button' onClick={handleAddProjectOpen}>Add Project</Button>
+            <div style={{textAlign: "right", marginRight: "20px", marginTop: "10px"}}><Button style={{justifySelf: 'end'}} className='blue-button' onClick={handleAddProjectOpen}>Add Project</Button>
             <AddProjectModal open={isAddModalOpen} onCancel={() => setIsAddModalOpen(false)} onAdd={handleAddProject}/>
             </div>
         )}

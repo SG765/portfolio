@@ -20,3 +20,23 @@ export const get_all_tags= async() =>{
         throw error;
     }
 }
+
+export const delete_tag = async (id) =>{
+    try{
+        const response= await Tag.DELETE_tag(id)
+        return response;
+    }catch (error) {
+        console.error('Error deleting tag:', error);
+        throw error;
+    }
+}
+
+export const update_tag = async (id, name, icon) =>{
+    try{
+        const response= await Tag.UPDATE_tag(id, name, icon)
+        //return response;
+    }catch (error) {
+        console.error('Error editing tag:', error);
+        throw error;
+    }
+}

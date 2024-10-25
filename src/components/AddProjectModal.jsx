@@ -105,10 +105,10 @@ const AddProjectModal = ({ open, onCancel, projData, mode, onAdd }) => {
           <div id="editor" ref={editorRef}></div>
         </Form.Item>
         <Form.Item label="Start Date" name="start" rules={[{ required: true, message: 'Please select start date!' }]}>
-          <DatePicker />
+          <DatePicker picker="year"/>
         </Form.Item>
         <Form.Item label="End Date" name="end" rules={[{ required: true, message: 'Please select end date!' }]}>
-          <DatePicker />
+          <DatePicker picker='year'/>
         </Form.Item>
         <Form.Item label="Repository" name="repo">
           <Input placeholder="Enter repo link" />

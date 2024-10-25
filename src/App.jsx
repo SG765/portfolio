@@ -4,6 +4,7 @@ import {BrowserRouter, Route, Routes} from 'react-router-dom'
 import About from './pages/About';
 import Login from './pages/Login';
 import Projects from './pages/Projects';
+import Tags from './pages/Tags';
 import Navigation from './components/Navigation';
 import { auth, db } from './firebase'
 import {onAuthStateChanged  } from "firebase/auth";
@@ -86,6 +87,7 @@ function App() {
             <Route path="/" element={<Projects loggedIn={loggedIn}/>} />
             <Route path="/projects" element={<Projects loggedIn={loggedIn} />} />
             <Route path="/about" element={<About loggedIn={loggedIn}/>} />
+            <Route path="/tags" element= {<Tags loggedIn={loggedIn}/>} />
             <Route path="/login" element={<Login loggedIn={loggedIn}/>} />
             <Route path="/projects/:name" element={<ProjDetails loggedIn={loggedIn} />} />
           </Routes>

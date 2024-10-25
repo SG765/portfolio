@@ -16,8 +16,33 @@ function Navigation({loggedIn}){
     }, []);
 
     const navigate= useNavigate();
-
-    const navItems = [
+    let navItems = []
+    if (loggedIn){
+    navItems = [
+        {
+          label: 'Projects',
+          key: 'projects',
+          icon: '',
+        }, 
+        {
+            label: 'About',
+            key: 'about',
+            icon: '',
+        },
+        {
+          label: 'Tags',
+          key: 'tags',
+          icon: '',
+      },
+        {
+            label: loggedIn ? 'Logout' : 'Login',
+            key: loggedIn ? 'logout' : 'login',
+            icon: '', 
+            isHidden: true,
+            color: 'white',
+        }
+    ]} if(!loggedIn){
+      navItems= [
         {
           label: 'Projects',
           key: 'projects',
@@ -34,8 +59,8 @@ function Navigation({loggedIn}){
             icon: '', 
             isHidden: true,
             color: 'white',
-        }
-    ]
+        }]
+    };
 
     const [current, setCurrent] = useState('projects');
 

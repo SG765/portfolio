@@ -20,6 +20,7 @@ function ProjectCard({index, projData, loggedIn, onDelete}){
   const navigate= useNavigate();
   const [popDeleteOpen, setPopDeleteOpen] = useState(false); 
   const [showAllTags, setShowAllTags] = useState(false);
+  const [confirmLoading, setConfirmLoading] = useState(false);
 
   useEffect(() => {
     // Check authentication status and update loggedIn state
@@ -55,7 +56,7 @@ function ProjectCard({index, projData, loggedIn, onDelete}){
     setShortDesc(newDesc)
   };
 
-  const handleDelete = async () =>{
+  const handleDelete = async (e) =>{
     e.stopPropagation();
     setConfirmLoading(true);
     const id=projData.id
@@ -65,8 +66,7 @@ function ProjectCard({index, projData, loggedIn, onDelete}){
       onDelete(id)
     }
 
-    setTimeout(() => {
-      setOpen(false);
+    setTimeout(() => { 
       setConfirmLoading(false);
     }, 2000);
 
