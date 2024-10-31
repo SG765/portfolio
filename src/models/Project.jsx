@@ -16,8 +16,8 @@ export default class Project{
         this.name=name;
         this.shortDesc=shortDesc;
         this.desc=desc;
-        this.startDate = startDate instanceof Date ? startDate : startDate.toDate(); // change to date
-        this.endDate = endDate instanceof Date ? endDate : endDate.toDate(); // change to date
+        this.startDate = startDate;  
+        this.endDate = endDate;  
         this.repo=repo;
         this.deploy=deploy;
         this.cover=cover;
