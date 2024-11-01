@@ -11,12 +11,12 @@ import EditProjectModal from '../components/EditProjectModal';
 import { motion } from "framer-motion";
 
 
-function Projects({loggedIn}){
+function Projects({loggedIn, email}){
     const [isAddModalOpen, setIsAddModalOpen]= useState(false);
     const [projects, setProjects]= useState([])
     const [isEditModalOpen, setEditModalOpen] = useState(Array(projects.length).fill(false));
     const [loading, setLoading] = useState(false)
-
+    
     const listVariants = {
         loaded: { opacity: 1, transition: {
             when: "beforeChildren",
@@ -99,7 +99,7 @@ function Projects({loggedIn}){
         }} initial="initial"  variants={pageVariants} animate="in" exit="out" transition={pageTransition}> 
         { loggedIn && (
             <div style={{textAlign: "right", marginRight: "20px", marginTop: "10px"}}><Button style={{justifySelf: 'end'}} className='blue-button' onClick={handleAddProjectOpen}>Add Project</Button>
-            <AddProjectModal open={isAddModalOpen} onCancel={() => setIsAddModalOpen(false)} onAdd={handleAddProject}/>
+            <AddProjectModal open={isAddModalOpen} onCancel={() => setIsAddModalOpen(false)} onAdd={handleAddProject} email={email}/>
             </div>
         )}
 

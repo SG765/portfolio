@@ -1,9 +1,12 @@
 import Project from '../models/Project'
 
 
-export const create_project= async(name, shortDesc, desc, startDate,endDate, repo, deploy, cover)=>{
+export const create_project= async(name, shortDesc, desc, startDate,endDate, repo, deploy, cover, email)=>{
+    if (cover === null){
+        cover= '';
+    } 
     try{ 
-        const success= await Project.POST_project(name, shortDesc, desc, startDate,endDate, repo,deploy, cover) 
+        const success= await Project.POST_project(name, shortDesc, desc, startDate,endDate, repo,deploy, cover, email) 
         return success;
     } catch (error) {
         console.error('Error creating project:', error);

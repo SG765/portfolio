@@ -156,9 +156,12 @@ function ProjDetails({loggedIn}){
 
     const contentStyle = {
         height: '400px',
+        textAlign: "center",
+        justifyContent: "center",
         color: '#fff',
         background: '#364d79',
-        margin: 'auto',   
+        margin: 'auto', 
+        overflowY: 'scroll',  
       };
 
       const imgEditStyle = {
@@ -181,7 +184,7 @@ function ProjDetails({loggedIn}){
         textAlign: "center",
         margin: "auto",
         overflowY: "auto",
-        height: '70px',
+        height: 'fit-content',
       };
 
       const Controls = () => {
@@ -421,7 +424,7 @@ function ProjDetails({loggedIn}){
             <Flex  gap={gap}>
                 <motion.div exit={{x:"-100vw"}}><ArrowLeftOutlined className='back-arrow' onClick={handleGoBack}/> </motion.div>
             {projData && (
-                <div style={{width: "90%"}} >
+                <div className='det-content' >
                     <Flex gap="large" style={{justifyContent: "space-between"}}>
                         <div className='proj-title'>
                         {editMode ? (
@@ -434,7 +437,6 @@ function ProjDetails({loggedIn}){
                         </div>
                         <div style={{alignSelf: 'center', fontSize: '14px', fontStyle: "italic", fontFamily: "Times New Roman"}}>(
                             {startDate === endDate ? startDate : `${startDate} - ${endDate}`}
-                            
                             )
                         </div>
                     </Flex> 
@@ -476,7 +478,7 @@ function ProjDetails({loggedIn}){
                         <Carousel arrows autoplay autoplaySpeed={5000} style={{margin: "10px"}} >
                             {filteredImages.map((image, index) => ( 
                                 <div key={index} style={{justifyItems: "center", height: "fit-content"}}>
-                                    <div style={{height: "400px", justifyContent: "centered", width: "auto" }}>
+                                    <div className='caro-img-container' style={{justifyContent: "center", width: "auto" }}>
                                         <Image src={image.src} alt={`Slide ${index + 1}`} preview={{visible: false}} style={contentStyle} onClick={() => handleImageClick(index)}/>
                                     </div>
                                     <div style={descriptionStyle}>
@@ -487,11 +489,11 @@ function ProjDetails({loggedIn}){
                         </Carousel>): (
                             <>
                             <Flex style={{padding: "10px", flexWrap: "wrap"}}> 
-                            
+                            <Button style={{textAlign: "right"}} onClick={handleURLModalOpen} className='blue-button' >Add img Via URL</Button>
                             <Reorder.Group axis="x" values={editImages} onReorder={setEditImages} style={{height: "fit-content", display: "flex", maxWidth: "80vw", overflowX: "scroll", justifyContent: "start", listStyle: "none" }}>
                                 {editImages.map((image, index) => (
                                     <Reorder.Item key={image.id} value={image} style={{ padding: "10px", cursor: "grab", boxSizing: "border-box" }}>
-                                        <div className="edit-img-container" onClick={(event) => handleEditImageClick(index, event)} style={{ border: selectedImageIndex === index ? '2px white blue' : 'none' }}>
+                                        <div className="edit-img-container" onClick={(event) => handleEditImageClick(index, event)} style={{ border: selectedImageIndex === index ? '2px solid aqua' : 'none' }}>
                                             <img src={image.src} alt={`Slide ${index + 1}`} style={imgEditStyle} />
                                             {image.show ? (
                                                 <EyeOutlined className='eye-icon' onClick={(event) => handleIconClick(event, 'toggleDisplay', index)} />
@@ -509,7 +511,6 @@ function ProjDetails({loggedIn}){
                             </Dragger>
                             <input multiple type="file" ref={fileInputRef} className="file-input" onChange={handleFileChange}/>
                             <PlusCircleOutlined className='plus-icon' id="uploadButton" onClick={handleImgUploadClick} style={{alignSelf: "flex-center", fontSize: "2rem"}}/>
-                            <Button onClick={handleURLModalOpen} className='blue-button' >Add Via URL</Button>
                             </Flex>
                             
                             <div style={{ textAlign: "center", padding: "10px" }} className='edit-img-desc'>

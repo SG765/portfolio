@@ -14,6 +14,7 @@ import { AnimatePresence } from 'framer-motion';
 
 function App() { 
   const [loggedIn, setLoggedIn]= useState(false);
+  const [email, setEmail]= useState(null)
   const confettiRef= useRef(null)
 
   useEffect(() => {
@@ -63,7 +64,8 @@ function App() {
 
     const handleLoginChange = onAuthStateChanged(auth, async (user) => {
       if (user) {
-          setLoggedIn(true); 
+          setLoggedIn(true);
+          setEmail(user.email);
       } else {
           // User is signed out.
           setLoggedIn(false);
@@ -76,6 +78,7 @@ function App() {
     message.success("Hello")
   }
 
+
   return (
     <div className="app-bg">
       <div ref={confettiRef} id="confetti-container" />
@@ -84,12 +87,12 @@ function App() {
         <div className="content">
           <AnimatePresence mode="wait">
           <Routes>
-            <Route path="/" element={<Projects loggedIn={loggedIn}/>} />
-            <Route path="/projects" element={<Projects loggedIn={loggedIn} />} />
+            <Route path="/" element={<Projects loggedIn={loggedIn} email={email}/>} />
+            <Route path="/projects" element={<Projects loggedIn={loggedIn} email={email}/>} />
             <Route path="/about" element={<About loggedIn={loggedIn}/>} />
-            <Route path="/tags" element= {<Tags loggedIn={loggedIn}/>} />
+            <Route path="/tags" element= {<Tags loggedIn={loggedIn}/>} email={email}/>
             <Route path="/login" element={<Login loggedIn={loggedIn}/>} />
-            <Route path="/projects/:name" element={<ProjDetails loggedIn={loggedIn} />} />
+            <Route path="/projects/:name" element={<ProjDetails loggedIn={loggedIn} email={email}/>} />
           </Routes>
           </AnimatePresence>
         </div>

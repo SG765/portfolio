@@ -43,11 +43,10 @@ const EditProjectModal = ({ open, onCancel, projData, mode, onUpdate }) => {
   const onFinish = async(values) => {   
     setLoading(true)
     const updatedName = values.name || name;
-    const updatedShortDesc = values.shortDesc || shortDesc;
-    console.log(values.start)
+    const updatedShortDesc = values.shortDesc || shortDesc; 
     const updatedStartDate = values.start ? values.start.year() : startDate;
     const updatedEndDate = values.end ? values.end.year() : endDate; 
-
+    console.log( updatedName, updatedEndDate, updatedShortDesc, updatedStartDate, projData.desc)
     const success= await update_project(projData.id, updatedName, updatedShortDesc, projData.desc, updatedStartDate, updatedEndDate, projData.repo, projData.deploy, coverImg, projData.images, projData.tags, projData.shown)
     if (success) {
       onUpdate(coverImg, updatedName, updatedShortDesc); // Call callback to update cover image

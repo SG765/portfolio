@@ -7,7 +7,7 @@ import { UploadOutlined } from '@ant-design/icons';
 
 const { TextArea } = Input;
 
-const AddProjectModal = ({ open, onCancel, projData, mode, onAdd }) => {
+const AddProjectModal = ({ open, onCancel, projData, mode, onAdd, email }) => {
   const [form] = Form.useForm();
   const [desc, setDescription] = useState('');
   const editorRef = useRef(null);
@@ -60,11 +60,14 @@ const AddProjectModal = ({ open, onCancel, projData, mode, onAdd }) => {
   const onFinish = async(values) => {
     const quillContent = editorRef.current.querySelector('.ql-editor').innerHTML;
     setLoading(true)
-    const success= await create_project(values.name, values.shortDesc, quillContent, values.start, values.end, values.repo, values.deploy, coverImg)
+    const success= await create_project(values.name, values.shortDesc, quillContent, values.start.year(), values.end.year(), values.repo, values.deploy, coverImg, email)
     if(success.status === 200){  
         message.success(success.body)
         setLoading(false)
         onAdd();
+    }else{
+      message.error(success.body)
+      setLoading(false)
     }
     onCancel();
   };

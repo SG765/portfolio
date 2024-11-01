@@ -70,7 +70,7 @@ function TagCard({index, tagData, dbTagData, selectMode, loggedIn, onDelete, onS
       };
 
     return(
-        <div className="tag-card" style={{width: "fit-content", height: "fit-content", backgroundColor: bgColor }}> 
+        <div className="tag-card" style={{ backgroundColor: bgColor }}> 
             {selectMode && dbTagData ? (
                 <>
                     <div className='tag-edit'><img width="25" height= "20"  src={tagData.icon}/> {tagData.name} <Button className="remove-x" onClick={handleDelete}>x</Button></div>
@@ -85,10 +85,10 @@ function TagCard({index, tagData, dbTagData, selectMode, loggedIn, onDelete, onS
             : ( <div style={{justifyContent: "center"}}>
                     <span style={{justifyContent: "center", display: "flex", flexWrap: "nowrap"}}>
                         <img width="22" height= "22"  src={tagData.icon}/> 
-                        <div style={{alignSelf: "center", marginLeft: "5px"}}>{tagData.name}</div>
+                        <div className='tag-name' style={{alignSelf: "center", marginLeft: "5px"}}>{tagData.name}</div>
                     </span>
                     { tagData.subtitles && tagData.subtitles.length > 0 && (
-                    <div style= {{fontSize: "12px", padding: "1px 5px", opacity: "0.7"}}>
+                    <div className='tag-sub' style= {{padding: "1px 5px", opacity: "0.7"}}>
                         {tagData.subtitles && tagData.subtitles.join(', ')}
                     </div>
                 )}

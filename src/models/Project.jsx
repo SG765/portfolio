@@ -23,7 +23,7 @@ export default class Project{
         this.cover=cover;
     }
 
-    static async POST_project ( name, shortDesc, desc, startDate, endDate, repo, deploy, cover ) {
+    static async POST_project ( name, shortDesc, desc, startDate, endDate, repo, deploy, cover, email ) {
         try {
             //create  instance
             const project = new Project( name, shortDesc, desc, startDate, endDate, repo, deploy, cover ); 

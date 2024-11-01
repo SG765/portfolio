@@ -6,6 +6,12 @@
     box-shadow: 0 1px 5px rgb(0, 0, 0, 0.3);
     background-color: rgba(240, 248, 255, 0.138);
     margin: 5px;
+    width: fit-content;
+    height: fit-content;
+}
+
+.tag-sub{
+    font-size: 12px;
 }
 
 .remove-x{
@@ -14,4 +20,14 @@
     height: fit-content;
     align-self: center;
     border: none;
+}
+
+@media (max-width: 800px){
+    .tag-name{
+        font-size: 12px;
+    }
+
+    .tag-sub{
+        font-size: 10px;
+    }
 }
